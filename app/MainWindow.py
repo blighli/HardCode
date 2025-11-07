@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTex
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from .utils import assets_path, serial_port
+from .RangeWidget import RangeWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -67,10 +68,14 @@ class MainWindow(QMainWindow):
         sendBox.addWidget(self.messageSendButton)
         leftBox.addLayout(sendBox)
 
+        leftBox.addWidget(RangeWidget(minValue=10, maxValue=80, value=50))
+
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
         
         self.statusBar().showMessage("Ready!")
+
+
 
     def connectPort(self):
         # Serial Port Connection Logic
