@@ -6,7 +6,7 @@ from .utils import assets_path, serial_port
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.port: QSerialPort | None = None
+        self.serialPort: QSerialPort | None = None
         self.initUI()
 
 
@@ -74,9 +74,9 @@ class MainWindow(QMainWindow):
 
     def connectPort(self):
         # Serial Port Connection Logic
-        if self.port is not None:
-            self.port.close()
-            self.port = None
+        if self.serialPort is not None:
+            self.serialPort.close()
+            self.serialPort = None
             self.statusBar().showMessage("Serial port closed.")
             self.portComboBox.setEnabled(True)
             self.baudRateComboBox.setEnabled(True)
@@ -86,8 +86,9 @@ class MainWindow(QMainWindow):
         # Connect to Serial Port
         port = self.portComboBox.currentText()
         baud_rate = int(self.baudRateComboBox.currentText())
-        self.port = serial_port.connect(port, baud_rate)
-        if self.port is not None:
+        self.serialPort = serial_port.connect(port, baud_rate)
+        if self.serialPort is not None:
+            self.serialPort.readyRead.connect(self.readData)
             self.statusBar().showMessage(f"Connected to {port} at {baud_rate} baud.")
             self.portComboBox.setEnabled(False)
             self.baudRateComboBox.setEnabled(False)
@@ -95,3 +96,11 @@ class MainWindow(QMainWindow):
             self.messageSendButton.setEnabled(True)
         else:
             QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port} at {baud_rate} baud.") 
+
+    def readData(self):
+        try:
+            data = self.serialPort.readAll()
+            data = str(data.data(), encoding='utf-8')
+            self.messageDisplay.append(data)
+        except:
+            self.messageDisplay.append("error\n")
