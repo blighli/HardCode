@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         sendBox.addWidget(self.messageSendButton)
         leftBox.addLayout(sendBox)
 
-        self.rangeWidget = RangeWidget(minValue=10, maxValue=80, value=50)
+        self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
         self.rangeWidget.value_changed.connect(self.rangeValueChanged)
         leftBox.addWidget(self.rangeWidget)
 
@@ -109,6 +109,9 @@ class MainWindow(QMainWindow):
         try:
             data = self.serialPort.readAll()
             data = str(data.data(), encoding='utf-8')
-            self.messageDisplay.append(data)
+            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data)
+            self.messageDisplay.verticalScrollBar().setValue(
+                self.messageDisplay.verticalScrollBar().maximum()
+            )
         except:
             self.messageDisplay.append("error\n")
