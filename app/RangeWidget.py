@@ -1,7 +1,10 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QLineEdit, QSlider, QSpinBox
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 
 class RangeWidget(QWidget):
+
+    value_changed = pyqtSignal(str, int)
+
     def __init__(self, minValue=0, maxValue=100, value=0, parent=None):
         super(RangeWidget, self).__init__(parent)
         self.minValue = minValue
@@ -58,11 +61,20 @@ class RangeWidget(QWidget):
 
         self.setLayout(self.layout)
 
+    def name(self):
+        return self.nameEdit.text()
+
+    def updateValue(self):
+        self.value = self.slider.value()
+        self.value_changed.emit(self.nameEdit.text(), self.value)
+
     def sliderUpdate(self):
         self.spin.setValue(self.slider.value())
+        self.updateValue()
 
     def spinUpdate(self):
         self.slider.setValue(self.spin.value())
+        self.updateValue()
 
     def rangeUpdate(self):
         try:
@@ -71,6 +83,7 @@ class RangeWidget(QWidget):
             self.spin.setRange(self.minValue, self.maxValue)
             self.slider.setRange(self.minValue, self.maxValue)
             self.slider.setTickInterval(int((self.maxValue - self.minValue)/10))
+            self.updateValue()
         except:
             self.minEdit.setText(str(self.minValue))
             self.maxEdit.setText(str(self.maxValue))

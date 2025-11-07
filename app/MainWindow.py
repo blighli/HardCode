@@ -68,14 +68,17 @@ class MainWindow(QMainWindow):
         sendBox.addWidget(self.messageSendButton)
         leftBox.addLayout(sendBox)
 
-        leftBox.addWidget(RangeWidget(minValue=10, maxValue=80, value=50))
+        self.rangeWidget = RangeWidget(minValue=10, maxValue=80, value=50)
+        self.rangeWidget.value_changed.connect(self.rangeValueChanged)
+        leftBox.addWidget(self.rangeWidget)
 
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
         
         self.statusBar().showMessage("Ready!")
 
-
+    def rangeValueChanged(self, name, value):
+        self.statusBar().showMessage(f"{name}={value}")
 
     def connectPort(self):
         # Serial Port Connection Logic
