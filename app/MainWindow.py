@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from .utils import assets_path, serial_port
@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
 
 
     def initUI(self):
-
+        LINE_HEIGHT = 30
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
         self.setWindowTitle("Hello from HardCode!")
@@ -31,28 +31,46 @@ class MainWindow(QMainWindow):
         # Serial Port Selection
         portBox = QHBoxLayout()
         leftBox.addLayout(portBox)
-        leftBox.addStretch()
         # Serial Port ComboBox
         self.portComboBox = QComboBox()
-        self.portComboBox.setFixedWidth(200)
+        self.portComboBox.setMinimumWidth(200)
+        self.portComboBox.setFixedHeight(LINE_HEIGHT)
         portList = serial_port.get_port_names()
         for port in portList:
             self.portComboBox.addItem(port)
         # Baud Rate ComboBox
         self.baudRateComboBox = QComboBox()
-        self.baudRateComboBox.setFixedWidth(100)
+        self.baudRateComboBox.setMinimumWidth(200)
+        self.baudRateComboBox.setFixedHeight(LINE_HEIGHT)
         self.baudRateComboBox.addItems(["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"])
         self.baudRateComboBox.setCurrentIndex(4)  # Default to 115200
         # Connect Button
         self.portConnectButton = QPushButton("打开串口")
         self.portConnectButton.setFixedWidth(100)
+        self.portConnectButton.setFixedHeight(LINE_HEIGHT)
         # Add widgets to portBox
         portBox.addWidget(self.portComboBox)
         portBox.addWidget(self.baudRateComboBox)
         portBox.addWidget(self.portConnectButton)
+        
+        self.messageDisplay = QTextEdit()
+        leftBox.addWidget(self.messageDisplay)
+
+        self.messageEdit = QLineEdit()
+        self.messageEdit.setFixedHeight(LINE_HEIGHT)
+        self.messageSendButton = QPushButton("发送")
+        self.messageSendButton.setFixedWidth(100)
+        self.messageSendButton.setFixedHeight(LINE_HEIGHT)
+        self.messageSendButton.setEnabled(False)
+        sendBox = QHBoxLayout()
+        sendBox.addWidget(self.messageEdit)
+        sendBox.addWidget(self.messageSendButton)
+        leftBox.addLayout(sendBox)
 
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
+        
+        self.statusBar().showMessage("Ready!")
 
     def connectPort(self):
         # Serial Port Connection Logic
@@ -63,6 +81,7 @@ class MainWindow(QMainWindow):
             self.portComboBox.setEnabled(True)
             self.baudRateComboBox.setEnabled(True)
             self.portConnectButton.setText("打开串口")
+            self.messageSendButton.setEnabled(False)
             return
         # Connect to Serial Port
         port = self.portComboBox.currentText()
@@ -73,5 +92,6 @@ class MainWindow(QMainWindow):
             self.portComboBox.setEnabled(False)
             self.baudRateComboBox.setEnabled(False)
             self.portConnectButton.setText("关闭串口")
+            self.messageSendButton.setEnabled(True)
         else:
             QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port} at {baud_rate} baud.") 
