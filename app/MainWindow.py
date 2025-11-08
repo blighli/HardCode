@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         self.portComboBox = QComboBox()
         self.portComboBox.setMinimumWidth(200)
         self.portComboBox.setFixedHeight(LINE_HEIGHT)
-        portList = serial_port.get_port_names()
+        portList = serial_port.get_serial_ports()
         for port in portList:
-            self.portComboBox.addItem(port)
+            self.portComboBox.addItem(f"{port.portName()} - [ {port.description()} , {port.manufacturer()} ]", port)
         # Baud Rate ComboBox
         self.baudRateComboBox = QComboBox()
         self.baudRateComboBox.setMinimumWidth(200)
@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
             self.messageSendButton.setEnabled(False)
             return
         # Connect to Serial Port
-        port = self.portComboBox.currentText()
+        port = self.portComboBox.currentData()
         baud_rate = int(self.baudRateComboBox.currentText())
         self.serialPort = serial_port.connect(port, baud_rate)
         if self.serialPort is not None:
