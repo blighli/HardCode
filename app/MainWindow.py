@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox, QTableWidget, QTableWidgetItem
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtCore import QByteArray
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
         self.setWindowTitle("Hello from HardCode!")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1200, 800)
 
         # Central Widget and Layouts
         central_widget = QWidget()
@@ -76,6 +76,24 @@ class MainWindow(QMainWindow):
         self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
         self.rangeWidget.value_changed.connect(self.rangeValueChanged)
         leftBox.addWidget(self.rangeWidget)
+
+        tableHeaders = ["pos", "len", "type", "name", "value"]
+        self.readTableView = QTableWidget()
+        rightBox.addWidget(self.readTableView)
+        self.readTableView.setColumnCount(len(tableHeaders))
+        self.readTableView.setHorizontalHeaderLabels(tableHeaders)
+        self.readTableView.setRowCount(10)
+        self.readTableView.setItem(0, 0, QTableWidgetItem("0"))
+        self.readTableView.setItem(0, 1, QTableWidgetItem("2"))
+        self.readTableView.setItem(0, 2, QTableWidgetItem("str"))
+        self.readTableView.setItem(0, 3, QTableWidgetItem("姓名"))
+        self.readTableView.setItem(0, 4, QTableWidgetItem("bligh"))
+
+        self.sendTableView = QTableWidget()
+        rightBox.addWidget(self.sendTableView)
+        self.sendTableView.setColumnCount(len(tableHeaders))
+        self.sendTableView.setHorizontalHeaderLabels(tableHeaders)
+
 
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
