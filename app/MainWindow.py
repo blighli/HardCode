@@ -134,15 +134,21 @@ class MainWindow(QMainWindow):
                 self.messageDisplay.append("error\n")
 
     def sendData(self):
-        if self.hexCheckBox.isChecked():
-            pass
-        else:
-            data = self.messageEdit.text()
-            if data and self.serialPort.isOpen():
+        
+        data = self.messageEdit.text()
+        if data and self.serialPort.isOpen():
+            if self.hexCheckBox.isChecked():
+                try:
+                    byteArray = QByteArray(bytes.fromhex(data.replace(" ","")))
+                except:
+                    QMessageBox.critical(self, "Send Data Error", f"Not hex format data {data}") 
+                    return
+            else:
                 byteArray = QByteArray(data.encode('utf-8'))
-                self.serialPort.write(byteArray)
-                # Echo Sent Message
-                self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data + "\n")
-                self.messageDisplay.verticalScrollBar().setValue(
-                    self.messageDisplay.verticalScrollBar().maximum()
-                )
+            
+            self.serialPort.write(byteArray)
+            # Echo Sent Message
+            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data + "\n")
+            self.messageDisplay.verticalScrollBar().setValue(
+                self.messageDisplay.verticalScrollBar().maximum()
+            )
