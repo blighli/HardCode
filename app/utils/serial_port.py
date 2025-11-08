@@ -9,7 +9,12 @@ def get_port_names():
 def get_serial_ports():
     portList = QSerialPortInfo.availablePorts()
     portList = sorted(portList, key=lambda port: eval(port.portName()[3:]))
-    return [port for port in portList if port.manufacturer() != "Microsoft"]
+    return [port for port in portList 
+            if "USB" in port.description() 
+            or "SERIAL" in port.description() 
+            or "CH340" in port.description() 
+            or port.manufacturer() != "Microsoft"
+            ]
 
 def get_port_by_name(name: str) -> QSerialPort | None:
     portList = QSerialPortInfo.availablePorts()
