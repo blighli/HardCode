@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtCore import QByteArray
@@ -64,9 +64,13 @@ class MainWindow(QMainWindow):
         self.messageSendButton.setFixedWidth(100)
         self.messageSendButton.setFixedHeight(LINE_HEIGHT)
         self.messageSendButton.setEnabled(False)
+        self.hexCheckBox = QCheckBox()
+        self.hexCheckBox.setText("Hex")
+
         sendBox = QHBoxLayout()
         sendBox.addWidget(self.messageEdit)
         sendBox.addWidget(self.messageSendButton)
+        sendBox.addWidget(self.hexCheckBox)
         leftBox.addLayout(sendBox)
 
         self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
@@ -108,18 +112,37 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port} at {baud_rate} baud.") 
 
     def readData(self):
-        try:
+        if self.hexCheckBox.isChecked():
             data = self.serialPort.readAll()
-            data = str(data.data(), encoding='utf-8')
-            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data)
+            
+            data = [ x.hex() for x in data]
+            
+            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + " ".join(data) + "\n")
             self.messageDisplay.verticalScrollBar().setValue(
                 self.messageDisplay.verticalScrollBar().maximum()
             )
-        except:
-            self.messageDisplay.append("error\n")
+            
+        else:
+            try:
+                data = self.serialPort.readAll()
+                data = str(data.data(), encoding='utf-8')
+                self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data)
+                self.messageDisplay.verticalScrollBar().setValue(
+                    self.messageDisplay.verticalScrollBar().maximum()
+                )
+            except:
+                self.messageDisplay.append("error\n")
 
     def sendData(self):
-        data = self.messageEdit.text()
-        if data and self.serialPort.isOpen():
-            byteArray = QByteArray(data.encode('utf-8'))
-            self.serialPort.write(byteArray)
+        if self.hexCheckBox.isChecked():
+            pass
+        else:
+            data = self.messageEdit.text()
+            if data and self.serialPort.isOpen():
+                byteArray = QByteArray(data.encode('utf-8'))
+                self.serialPort.write(byteArray)
+                # Echo Sent Message
+                self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data + "\n")
+                self.messageDisplay.verticalScrollBar().setValue(
+                    self.messageDisplay.verticalScrollBar().maximum()
+                )
