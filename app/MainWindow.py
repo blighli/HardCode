@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
+from PyQt6.QtCore import QByteArray
 from .utils import assets_path, serial_port
 from .RangeWidget import RangeWidget
 
@@ -74,6 +75,7 @@ class MainWindow(QMainWindow):
 
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
+        self.messageSendButton.clicked.connect(self.sendData)
         
         self.statusBar().showMessage("Ready!")
 
@@ -97,7 +99,7 @@ class MainWindow(QMainWindow):
         self.serialPort = serial_port.connect(port, baud_rate)
         if self.serialPort is not None:
             self.serialPort.readyRead.connect(self.readData)
-            self.statusBar().showMessage(f"Connected to {port} at {baud_rate} baud.")
+            self.statusBar().showMessage(f"Connected to {port.portName()} at {baud_rate} baud.")
             self.portComboBox.setEnabled(False)
             self.baudRateComboBox.setEnabled(False)
             self.portConnectButton.setText("关闭串口")
@@ -115,3 +117,9 @@ class MainWindow(QMainWindow):
             )
         except:
             self.messageDisplay.append("error\n")
+
+    def sendData(self):
+        data = self.messageEdit.text()
+        if data and self.serialPort.isOpen():
+            byteArray = QByteArray(data.encode('utf-8'))
+            self.serialPort.write(byteArray)
