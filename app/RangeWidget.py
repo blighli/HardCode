@@ -15,15 +15,15 @@ class RangeWidget(QWidget):
     def initUI(self):
         LINE_HEIGHT = 30
 
-        self.layout = QHBoxLayout()
+        layout = QHBoxLayout()
 
         self.nameEdit = QLineEdit()
         self.nameEdit.setPlaceholderText("参数名称")
         self.nameEdit.setFixedWidth(100)
         self.nameEdit.setFixedHeight(LINE_HEIGHT)
-        self.layout.addWidget(self.nameEdit)
+        layout.addWidget(self.nameEdit)
 
-        self.layout.addWidget(QLabel("="))
+        layout.addWidget(QLabel("="))
 
         self.spin = QSpinBox()
         self.spin.setFixedWidth(80)
@@ -32,21 +32,21 @@ class RangeWidget(QWidget):
         self.spin.setValue(self.value)
         self.spin.setSingleStep(1)
         self.spin.valueChanged.connect(self.spinUpdate)
-        self.layout.addWidget(self.spin)
+        layout.addWidget(self.spin)
 
-        self.layout.addWidget(QLabel("("))
+        layout.addWidget(QLabel("("))
         self.minEdit = QLineEdit(str(self.minValue))
         self.minEdit.setFixedWidth(50)
         self.minEdit.setFixedHeight(LINE_HEIGHT)
         self.minEdit.textChanged.connect(self.rangeUpdate)
-        self.layout.addWidget(self.minEdit)
-        self.layout.addWidget(QLabel("-"))
+        layout.addWidget(self.minEdit)
+        layout.addWidget(QLabel("-"))
         self.maxEdit = QLineEdit(str(self.maxValue))
         self.maxEdit.setFixedWidth(50)
         self.maxEdit.setFixedHeight(LINE_HEIGHT)
         self.maxEdit.textChanged.connect(self.rangeUpdate)
-        self.layout.addWidget(self.maxEdit)
-        self.layout.addWidget(QLabel(")"))
+        layout.addWidget(self.maxEdit)
+        layout.addWidget(QLabel(")"))
 
 
         self.slider = QSlider(Qt.Orientation.Horizontal)
@@ -57,9 +57,9 @@ class RangeWidget(QWidget):
         self.slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.slider.setSingleStep(1)
         self.slider.valueChanged.connect(self.sliderUpdate)
-        self.layout.addWidget(self.slider)
+        layout.addWidget(self.slider)
 
-        self.setLayout(self.layout)
+        self.setLayout(layout)
 
     def name(self):
         return self.nameEdit.text()

@@ -6,6 +6,7 @@ from .utils import assets_path, serial_port
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .MessageTableWidget import MessageTableWidget
+from .SerialPortWidget import SerialPortWidget
 import json
 
 class MainWindow(QMainWindow):
@@ -14,11 +15,6 @@ class MainWindow(QMainWindow):
 
         self.api_server = FastAPIServer()
         self.api_server.start()
-
-        # f = open(assets_path.get("assets/web/index.html"), 'r')
-        # self.html_content = f.read()
-        # f.close()
-        # print("Loaded HTML content length:", len(self.html_content))
 
         self.serialPort: QSerialPort | None = None
         self.initUI()
@@ -44,31 +40,11 @@ class MainWindow(QMainWindow):
         mainBox.addLayout(leftBox)
         mainBox.addLayout(rightBox)
 
-
-        # Serial Port Selection
-        portBox = QHBoxLayout()
-        leftBox.addLayout(portBox)
-        # Serial Port ComboBox
-        self.portComboBox = QComboBox()
-        self.portComboBox.setMinimumWidth(200)
-        self.portComboBox.setFixedHeight(LINE_HEIGHT)
-        portList = serial_port.get_serial_ports()
-        for port in portList:
-            self.portComboBox.addItem(f"{port.portName()} - [ {port.description()} , {port.manufacturer()} ]", port)
-        # Baud Rate ComboBox
-        self.baudRateComboBox = QComboBox()
-        self.baudRateComboBox.setMinimumWidth(200)
-        self.baudRateComboBox.setFixedHeight(LINE_HEIGHT)
-        self.baudRateComboBox.addItems(["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"])
-        self.baudRateComboBox.setCurrentIndex(4)  # Default to 115200
-        # Connect Button
-        self.portConnectButton = QPushButton("打开串口")
-        self.portConnectButton.setFixedWidth(100)
-        self.portConnectButton.setFixedHeight(LINE_HEIGHT)
-        # Add widgets to portBox
-        portBox.addWidget(self.portComboBox)
-        portBox.addWidget(self.baudRateComboBox)
-        portBox.addWidget(self.portConnectButton)
+        # Select Serial Port
+        serialPortWidget = SerialPortWidget()
+        serialPortWidget.port_open.connect(self.portOpen)
+        serialPortWidget.port_close.connect(self.portClose)
+        leftBox.addWidget(serialPortWidget)
         
         self.messageDisplay = QTextEdit()
         leftBox.addWidget(self.messageDisplay)
@@ -100,7 +76,7 @@ class MainWindow(QMainWindow):
         rightBox.addWidget(self.sendTable)
 
         # Connect Button Signal
-        self.portConnectButton.clicked.connect(self.connectPort)
+        
         self.messageSendButton.clicked.connect(self.sendData)
         
         self.statusBar().showMessage("Ready!")
@@ -108,30 +84,16 @@ class MainWindow(QMainWindow):
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")
 
-    def connectPort(self):
-        # Serial Port Connection Logic
-        if self.serialPort is not None:
-            self.serialPort.close()
-            self.serialPort = None
-            self.statusBar().showMessage("Serial port closed.")
-            self.portComboBox.setEnabled(True)
-            self.baudRateComboBox.setEnabled(True)
-            self.portConnectButton.setText("打开串口")
-            self.messageSendButton.setEnabled(False)
-            return
-        # Connect to Serial Port
-        port = self.portComboBox.currentData()
-        baud_rate = int(self.baudRateComboBox.currentText())
-        self.serialPort = serial_port.connect(port, baud_rate)
-        if self.serialPort is not None:
-            self.serialPort.readyRead.connect(self.readData)
-            self.statusBar().showMessage(f"Connected to {port.portName()} at {baud_rate} baud.")
-            self.portComboBox.setEnabled(False)
-            self.baudRateComboBox.setEnabled(False)
-            self.portConnectButton.setText("关闭串口")
-            self.messageSendButton.setEnabled(True)
-        else:
-            QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port} at {baud_rate} baud.") 
+    def portOpen(self, port):
+        self.serialPort = port
+        self.serialPort.readyRead.connect(self.readData)
+        self.messageSendButton.setEnabled(True)
+        self.statusBar().showMessage(f"Connected to {port.portName()} at {port.baudRate()} baud.")
+
+    def portClose(self):
+        self.serialPort = None
+        self.statusBar().showMessage("Serial port closed.")
+        self.messageSendButton.setEnabled(False)
 
     def readData(self):
         if self.hexCheckBox.isChecked():
