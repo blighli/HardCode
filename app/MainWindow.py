@@ -7,15 +7,14 @@ from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .MessageTableWidget import MessageTableWidget
 from .SerialPortWidget import SerialPortWidget
+from .MessageEditWidget import MessageEditWidget
 import json
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
         self.api_server = FastAPIServer()
         self.api_server.start()
-
         self.serialPort: QSerialPort | None = None
         self.initUI()
     
@@ -42,27 +41,16 @@ class MainWindow(QMainWindow):
 
         # Select Serial Port
         serialPortWidget = SerialPortWidget()
+        leftBox.addWidget(serialPortWidget)
         serialPortWidget.port_open.connect(self.portOpen)
         serialPortWidget.port_close.connect(self.portClose)
-        leftBox.addWidget(serialPortWidget)
         
         self.messageDisplay = QTextEdit()
         leftBox.addWidget(self.messageDisplay)
 
-        self.messageEdit = QLineEdit()
-        self.messageEdit.setFixedHeight(LINE_HEIGHT)
-        self.messageSendButton = QPushButton("发送")
-        self.messageSendButton.setFixedWidth(100)
-        self.messageSendButton.setFixedHeight(LINE_HEIGHT)
-        self.messageSendButton.setEnabled(False)
-        self.hexCheckBox = QCheckBox()
-        self.hexCheckBox.setText("Hex")
-
-        sendBox = QHBoxLayout()
-        sendBox.addWidget(self.messageEdit)
-        sendBox.addWidget(self.messageSendButton)
-        sendBox.addWidget(self.hexCheckBox)
-        leftBox.addLayout(sendBox)
+        self.messageEditWidget = MessageEditWidget()
+        self.messageEditWidget.message_send.connect(self.sendData)
+        leftBox.addWidget(self.messageEditWidget)
 
         self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
         self.rangeWidget.value_changed.connect(self.rangeValueChanged)
@@ -74,10 +62,6 @@ class MainWindow(QMainWindow):
 
         self.sendTable = MessageTableWidget()
         rightBox.addWidget(self.sendTable)
-
-        # Connect Button Signal
-        
-        self.messageSendButton.clicked.connect(self.sendData)
         
         self.statusBar().showMessage("Ready!")
 
@@ -87,25 +71,22 @@ class MainWindow(QMainWindow):
     def portOpen(self, port):
         self.serialPort = port
         self.serialPort.readyRead.connect(self.readData)
-        self.messageSendButton.setEnabled(True)
+        self.messageEditWidget.setButtonEnabled(True)
         self.statusBar().showMessage(f"Connected to {port.portName()} at {port.baudRate()} baud.")
 
     def portClose(self):
         self.serialPort = None
         self.statusBar().showMessage("Serial port closed.")
-        self.messageSendButton.setEnabled(False)
+        self.messageEditWidget.setButtonEnabled(False)
 
     def readData(self):
-        if self.hexCheckBox.isChecked():
+        if self.messageEditWidget.isHexChecked():
             data = self.serialPort.readAll()
-            
-            data = [ x.hex() for x in data]
-            
+            data = [x.hex() for x in data]
             self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + " ".join(data) + "\n")
             self.messageDisplay.verticalScrollBar().setValue(
                 self.messageDisplay.verticalScrollBar().maximum()
-            )
-            
+            )        
         else:
             try:
                 data = self.serialPort.readAll()
@@ -117,10 +98,9 @@ class MainWindow(QMainWindow):
             except:
                 self.messageDisplay.append("error\n")
 
-    def sendData(self):       
-        data = self.messageEdit.text()
+    def sendData(self, data):
         if data and self.serialPort.isOpen():
-            if self.hexCheckBox.isChecked():
+            if self.messageEditWidget.isHexChecked():
                 try:
                     byteArray = QByteArray(bytes.fromhex(data.replace(" ","")))
                 except:
