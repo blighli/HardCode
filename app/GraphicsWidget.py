@@ -13,6 +13,17 @@ class GraphicsWidget(QOpenGLWidget):
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
 
+        # Get OpenGL version information
+        vendor = glGetString(GL_VENDOR).decode('utf-8')
+        renderer = glGetString(GL_RENDERER).decode('utf-8')
+        version = glGetString(GL_VERSION).decode('utf-8')
+        shader_version = glGetString(GL_SHADING_LANGUAGE_VERSION).decode('utf-8')
+
+        print(f"OpenGL Vendor: {vendor}")
+        print(f"OpenGL Renderer: {renderer}")
+        print(f"OpenGL Version: {version}")
+        print(f"GLSL Version: {shader_version}")
+
 
     def resizeGL(self, w: int, h: int):
         # Handle resizing of the OpenGL viewport here
