@@ -5,6 +5,7 @@ from PyQt6.QtCore import QByteArray
 from .utils import assets_path, serial_port
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
+from .MessageTableWidget import MessageTableWidget
 import json
 
 class MainWindow(QMainWindow):
@@ -91,49 +92,12 @@ class MainWindow(QMainWindow):
         self.rangeWidget.value_changed.connect(self.rangeValueChanged)
         leftBox.addWidget(self.rangeWidget)
 
-        tableHeaders = ["pos", "len", "type", "name", "value"]
-        self.readTableView = QTableWidget()
-        rightBox.addWidget(self.readTableView)
-        self.readTableView.setColumnCount(len(tableHeaders))
-        self.readTableView.setHorizontalHeaderLabels(tableHeaders)
-        self.readTableView.horizontalHeader().setStretchLastSection(True)   
-        
-        self.addButton = QPushButton("add")
-        self.addButton.setFixedWidth(100)
-        self.addButton.setFixedHeight(LINE_HEIGHT)
-        self.addButton.clicked.connect(self.addRow)
+        # Table View for Received Data
+        self.readTable = MessageTableWidget()
+        rightBox.addWidget(self.readTable)
 
-        self.delButton = QPushButton("del")
-        self.delButton.setFixedWidth(100)
-        self.delButton.setFixedHeight(LINE_HEIGHT)
-        self.delButton.clicked.connect(self.deleteRow)
-
-        self.loadButton = QPushButton("load")
-        self.loadButton.setFixedWidth(100)
-        self.loadButton.setFixedHeight(LINE_HEIGHT)
-        self.loadButton.clicked.connect(self.loadTable)
-
-        self.saveButton = QPushButton("save")
-        self.saveButton.setFixedWidth(100)
-        self.saveButton.setFixedHeight(LINE_HEIGHT)
-        self.saveButton.clicked.connect(self.saveTable)
-
-        buttonBox = QHBoxLayout()
-        buttonBox.addStretch()
-        buttonBox.addWidget(self.addButton)
-        buttonBox.addWidget(self.delButton)
-        buttonBox.addWidget(self.loadButton)
-        buttonBox.addWidget(self.saveButton)
-        buttonBox.addStretch()
-        rightBox.addLayout(buttonBox)
-
-
-
-        self.sendTableView = QTableWidget()
-        rightBox.addWidget(self.sendTableView)
-        self.sendTableView.setColumnCount(len(tableHeaders))
-        self.sendTableView.setHorizontalHeaderLabels(tableHeaders)
-
+        self.sendTable = MessageTableWidget()
+        rightBox.addWidget(self.sendTable)
 
         # Connect Button Signal
         self.portConnectButton.clicked.connect(self.connectPort)
@@ -210,47 +174,6 @@ class MainWindow(QMainWindow):
             self.messageDisplay.verticalScrollBar().setValue(
                 self.messageDisplay.verticalScrollBar().maximum()
             )
-
-    def addRow(self):
-        rowPosition = self.readTableView.rowCount()
-        self.readTableView.insertRow(rowPosition)
-        for col in range(self.readTableView.columnCount()):
-            self.readTableView.setItem(rowPosition, col, QTableWidgetItem(""))
-    
-    def deleteRow(self):
-        selectedRows = set()
-        for item in self.readTableView.selectedItems():
-            selectedRows.add(item.row())
-        for row in sorted(selectedRows, reverse=True):
-            self.readTableView.removeRow(row)
-    
-    def loadTable(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "JSON Files (*.json);;All Files (*)")
-        if not filename:
-            return
-        
-        with open(filename, 'r') as f:
-            data = json.load(f)
-        self.readTableView.setRowCount(0)
-        for row in data:
-            self.addRow()
-            for col, value in enumerate(row):
-                self.readTableView.setItem(self.readTableView.rowCount()-1, col, QTableWidgetItem(str(value)))
-    
-    def saveTable(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "JSON Files (*.json);;All Files (*)")
-        if not filename:
-            return
-        
-        data = []
-        for row in range(self.readTableView.rowCount()):
-            rowData = []
-            for col in range(self.readTableView.columnCount()):
-                item = self.readTableView.item(row, col)
-                rowData.append(item.text() if item else "")
-            data.append(rowData)
-        with open(filename, 'w') as f:
-            json.dump(data, f, indent=4)
     
     def refreshSerialPorts(self):
         self.portComboBox.clear()
