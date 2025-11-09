@@ -1,10 +1,14 @@
 import threading
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from .utils import assets_path
 
 app = FastAPI()
+web_path =assets_path.get("assets/web")
+app.mount("/", StaticFiles(directory=web_path), name="static")
 
-@app.get("/")
+@app.get("/hello")
 async def read_root(): 
     return {"Hello": "World"}
 

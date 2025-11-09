@@ -13,6 +13,11 @@ class MainWindow(QMainWindow):
         self.api_server = FastAPIServer()
         self.api_server.start()
 
+        # f = open(assets_path.get("assets/web/index.html"), 'r')
+        # self.html_content = f.read()
+        # f.close()
+        # print("Loaded HTML content length:", len(self.html_content))
+
         self.serialPort: QSerialPort | None = None
         self.initUI()
     
