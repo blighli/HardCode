@@ -6,7 +6,7 @@ from .utils import assets_path
 
 app = FastAPI()
 web_path =assets_path.get("assets/web")
-app.mount("/", StaticFiles(directory=web_path), name="static")
+app.mount("/", StaticFiles(directory=web_path, html=True), name="static")
 
 @app.get("/hello")
 async def read_root(): 
