@@ -4,13 +4,21 @@ from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtCore import QByteArray
 from .utils import assets_path, serial_port
 from .RangeWidget import RangeWidget
+from .WebService import FastAPIServer
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.api_server = FastAPIServer()
+        self.api_server.start()
+
         self.serialPort: QSerialPort | None = None
         self.initUI()
-
+    
+    def closeEvent(self, event):
+        self.api_server.stop()
+        event.accept()
 
     def initUI(self):
         LINE_HEIGHT = 30
