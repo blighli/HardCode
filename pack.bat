@@ -2,7 +2,7 @@
 set name=HardCode
 
 :执行打包命令生成exe文件
-pyinstaller --add-binary "assets;assets" -i "assets\app.ico" -wF main.py -n %name%
+uv run pyinstaller --add-binary "assets;assets" -i "assets\app.ico" -wF main.py -n %name% --clean
 
 :运行生成的exe程序
 dist\%name%.exe
