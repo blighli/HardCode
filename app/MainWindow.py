@@ -117,8 +117,7 @@ class MainWindow(QMainWindow):
             except:
                 self.messageDisplay.append("error\n")
 
-    def sendData(self):
-        
+    def sendData(self):       
         data = self.messageEdit.text()
         if data and self.serialPort.isOpen():
             if self.hexCheckBox.isChecked():
@@ -137,8 +136,4 @@ class MainWindow(QMainWindow):
                 self.messageDisplay.verticalScrollBar().maximum()
             )
     
-    def refreshSerialPorts(self):
-        self.portComboBox.clear()
-        portList = serial_port.get_serial_ports()
-        for port in portList:
-            self.portComboBox.addItem(f"{port.portName()} - [ {port.description()} , {port.manufacturer()} ]", port)
+

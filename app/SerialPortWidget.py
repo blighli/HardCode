@@ -21,9 +21,7 @@ class SerialPortWidget(QWidget):
         self.portComboBox = QComboBox()
         self.portComboBox.setMinimumWidth(200)
         self.portComboBox.setFixedHeight(LINE_HEIGHT)
-        portList = serial_port.get_serial_ports()
-        for port in portList:
-            self.portComboBox.addItem(f"{port.portName()} - [ {port.description()} , {port.manufacturer()} ]", port)
+        self.refreshSerialPorts()
         # Baud Rate ComboBox
         self.baudRateComboBox = QComboBox()
         self.baudRateComboBox.setMinimumWidth(200)
@@ -34,14 +32,24 @@ class SerialPortWidget(QWidget):
         self.portConnectButton = QPushButton("打开串口")
         self.portConnectButton.setFixedWidth(100)
         self.portConnectButton.setFixedHeight(LINE_HEIGHT)
+        # Refresh Button
+        self.portRefreshButton = QPushButton("刷新串口")
+        self.portRefreshButton.setFixedWidth(100)
+        self.portRefreshButton.setFixedHeight(LINE_HEIGHT)
         # Add widgets to layout
         layout.addWidget(self.portComboBox)
         layout.addWidget(self.baudRateComboBox)
         layout.addWidget(self.portConnectButton)
+        layout.addWidget(self.portRefreshButton)
 
         self.portConnectButton.clicked.connect(self.connectPort)
+        self.portRefreshButton.clicked.connect(self.refreshSerialPorts)
 
-
+    def refreshSerialPorts(self):
+        self.portComboBox.clear()
+        portList = serial_port.get_serial_ports()
+        for port in portList:
+            self.portComboBox.addItem(f"{port.portName()} - [ {port.description()} , {port.manufacturer()} ]", port)
 
     def connectPort(self):
         # Serial Port Connection Logic
