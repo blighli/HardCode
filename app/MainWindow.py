@@ -66,10 +66,11 @@ class MainWindow(QMainWindow):
         rightBox.addWidget(self.readTable)
 
         self.graphicsWidget = GraphicsWidget()
-        #self.graphicsWidget.setFixedWidth(400)
-        self.graphicsWidget.setMinimumHeight(200)
-        rightBox.addWidget(self.graphicsWidget)
-
+        self.graphicsWidget.setMinimumWidth(300)
+        self.graphicsWidget.setMinimumHeight(300)
+        rightBox.addWidget(self.graphicsWidget, 1)
+        
+         # Table View for Sent Data
         self.sendTable = MessageTableWidget()
         rightBox.addWidget(self.sendTable)
         

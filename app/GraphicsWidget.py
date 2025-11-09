@@ -12,6 +12,7 @@ class GraphicsWidget(QOpenGLWidget):
         glEnable(GL_LIGHTING)
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
+        glClearColor(1.0, 1.0, 1.0, 1.0)  # Set clear color to white
 
         # Get OpenGL version information
         vendor = glGetString(GL_VENDOR).decode('utf-8')
