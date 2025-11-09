@@ -7,6 +7,7 @@ from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .MessageTableWidget import MessageTableWidget
 from .SerialPortWidget import SerialPortWidget
+from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
 import json
 
@@ -45,7 +46,7 @@ class MainWindow(QMainWindow):
         serialPortWidget.port_open.connect(self.portOpen)
         serialPortWidget.port_close.connect(self.portClose)
         
-        self.messageDisplay = QTextEdit()
+        self.messageDisplay = MessageDisplayWidget()
         leftBox.addWidget(self.messageDisplay)
 
         self.messageEditWidget = MessageEditWidget()
@@ -83,20 +84,14 @@ class MainWindow(QMainWindow):
         if self.messageEditWidget.isHexChecked():
             data = self.serialPort.readAll()
             data = [x.hex() for x in data]
-            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + " ".join(data) + "\n")
-            self.messageDisplay.verticalScrollBar().setValue(
-                self.messageDisplay.verticalScrollBar().maximum()
-            )        
+            self.messageDisplay.appendMessage(" ".join(data) + "\n")  
         else:
             try:
                 data = self.serialPort.readAll()
                 data = str(data.data(), encoding='utf-8')
-                self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data)
-                self.messageDisplay.verticalScrollBar().setValue(
-                    self.messageDisplay.verticalScrollBar().maximum()
-                )
+                self.messageDisplay.appendMessage(data)
             except:
-                self.messageDisplay.append("error\n")
+                self.messageDisplay.appendMessage("error\n")
 
     def sendData(self, data):
         if data and self.serialPort.isOpen():
@@ -111,9 +106,6 @@ class MainWindow(QMainWindow):
             
             self.serialPort.write(byteArray)
             # Echo Sent Message
-            self.messageDisplay.setPlainText(self.messageDisplay.toPlainText() + data + "\n")
-            self.messageDisplay.verticalScrollBar().setValue(
-                self.messageDisplay.verticalScrollBar().maximum()
-            )
+            self.messageDisplay.appendMessage(data + "\n")
     
 
