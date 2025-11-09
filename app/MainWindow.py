@@ -2,6 +2,8 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTex
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtCore import QByteArray
+
+from app.GraphicsWidget import GraphicsWidget
 from .utils import assets_path, serial_port
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
@@ -17,6 +19,7 @@ class MainWindow(QMainWindow):
         self.api_server = FastAPIServer()
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
+        self.graphicsWidget: GraphicsWidget = None
         self.initUI()
     
     def closeEvent(self, event):
@@ -24,6 +27,7 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def initUI(self):
+        self.createMenuBar()
         LINE_HEIGHT = 30
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
@@ -65,6 +69,27 @@ class MainWindow(QMainWindow):
         rightBox.addWidget(self.sendTable)
         
         self.statusBar().showMessage("Ready!")
+
+    def createMenuBar(self):
+        menuBar = self.menuBar()
+        fileMenu = menuBar.addMenu("File")
+        exitAction = fileMenu.addAction("Exit")
+        exitAction.triggered.connect(self.close)
+
+        toolsMenu = menuBar.addMenu("Tools")
+        drawAction = toolsMenu.addAction("Draw")
+        drawAction.triggered.connect(self.openDrawWindow)
+        settingsAction = toolsMenu.addAction("Settings")
+
+        helpMenu = menuBar.addMenu("Help")
+        aboutAction = helpMenu.addAction("About")
+
+    def openDrawWindow(self):
+        if self.graphicsWidget is None:
+            self.graphicsWidget = GraphicsWidget()
+            self.graphicsWidget.setWindowTitle("OpenGL Draw Window")
+            self.graphicsWidget.setGeometry(150, 150, 800, 600)
+        self.graphicsWidget.show()
 
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")
