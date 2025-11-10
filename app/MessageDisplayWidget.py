@@ -11,6 +11,7 @@ class MessageDisplayWidget(QWidget):
 
         self.messageDisplay = QTextEdit()
         self.messageDisplay.setReadOnly(True)
+        self.messageDisplay.setStyleSheet("font-family: Consolas;")
         layout.addWidget(self.messageDisplay)
 
     def appendMessage(self, message):
@@ -18,3 +19,9 @@ class MessageDisplayWidget(QWidget):
         self.messageDisplay.verticalScrollBar().setValue(
             self.messageDisplay.verticalScrollBar().maximum()
         )
+
+    def send(self, message):
+        self.appendMessage("Send -> " + message)
+
+    def recv(self, message):
+        self.appendMessage("Recv <- " + message)

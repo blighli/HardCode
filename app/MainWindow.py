@@ -115,12 +115,12 @@ class MainWindow(QMainWindow):
         if self.messageEditWidget.isHexChecked():
             data = self.serialPort.readAll()
             data = [x.hex() for x in data]
-            self.messageDisplay.appendMessage(" ".join(data) + "\n")  
+            self.messageDisplay.recv(" ".join(data) + "\n")  
         else:
             try:
                 data = self.serialPort.readAll()
                 data = str(data.data(), encoding='utf-8')
-                self.messageDisplay.appendMessage(data)
+                self.messageDisplay.recv( data)
             except:
                 self.messageDisplay.appendMessage("error\n")
 
@@ -137,6 +137,6 @@ class MainWindow(QMainWindow):
             
             self.serialPort.write(byteArray)
             # Echo Sent Message
-            self.messageDisplay.appendMessage(data + "\n")
+            self.messageDisplay.send(data + "\n")
     
 
