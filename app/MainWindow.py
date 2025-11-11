@@ -11,18 +11,21 @@ from .MessageTableWidget import MessageTableWidget
 from .SerialPortWidget import SerialPortWidget
 from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
-import json
+import json,pickle
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.configFileName = "config/config.txt"
         self.api_server = FastAPIServer()
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
         self.graphicsWidget: GraphicsWidget = None
         self.initUI()
+        self.loadAppConfig()
     
     def closeEvent(self, event):
+        self.saveAppConfig()
         self.api_server.stop()
         event.accept()
 
@@ -45,10 +48,10 @@ class MainWindow(QMainWindow):
         mainBox.addLayout(rightBox)
 
         # Select Serial Port
-        serialPortWidget = SerialPortWidget()
-        leftBox.addWidget(serialPortWidget)
-        serialPortWidget.port_open.connect(self.portOpen)
-        serialPortWidget.port_close.connect(self.portClose)
+        self.serialPortWidget = SerialPortWidget()
+        leftBox.addWidget(self.serialPortWidget)
+        self.serialPortWidget.port_open.connect(self.portOpen)
+        self.serialPortWidget.port_close.connect(self.portClose)
         
         self.messageDisplay = MessageDisplayWidget()
         leftBox.addWidget(self.messageDisplay)
@@ -139,4 +142,22 @@ class MainWindow(QMainWindow):
             # Echo Sent Message
             self.messageDisplay.send(data + "\n")
     
+    def saveAppConfig(self):
+        self.appConfig["hexChecked"] = self.messageEditWidget.isHexChecked()
+        self.appConfig["baudRate"] = self.serialPortWidget.baudRate()
+        with open(self.configFileName, 'w') as f:
+            json.dump(self.appConfig, f, indent=4)
 
+    
+    def loadAppConfig(self):
+        self.appConfig = {
+            "hexChecked" : False,
+            "baudRate" : 115200
+        }
+        try:
+            with open(self.configFileName, 'r') as f:
+                self.appConfig = json.load(f)
+        except:
+            print("App config file not exists!")
+        self.messageEditWidget.setHexChecked(self.appConfig["hexChecked"])
+        self.serialPortWidget.setBaudRate(self.appConfig["baudRate"])

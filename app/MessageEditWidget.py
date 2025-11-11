@@ -35,3 +35,6 @@ class MessageEditWidget(QWidget):
 
     def isHexChecked(self):
         return self.hexCheckBox.isChecked()
+    
+    def setHexChecked(self, checked):
+        self.hexCheckBox.setChecked(checked)

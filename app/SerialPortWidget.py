@@ -45,6 +45,12 @@ class SerialPortWidget(QWidget):
         self.portConnectButton.clicked.connect(self.connectPort)
         self.portRefreshButton.clicked.connect(self.refreshSerialPorts)
 
+    def baudRate(self):
+        return int(self.baudRateComboBox.currentText())
+    
+    def setBaudRate(self, baudRate):
+        self.baudRateComboBox.setCurrentText(str(baudRate))
+
     def refreshSerialPorts(self):
         self.portComboBox.clear()
         portList = serial_port.get_serial_ports()
