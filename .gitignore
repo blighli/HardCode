@@ -264,3 +264,4 @@ cython_debug/
 *.out
 *.app
 
+config/config.txt

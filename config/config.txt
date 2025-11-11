@@ -1,4 +1,4 @@
 {
     "hexChecked": true,
-    "baudRate": 115200
+    "baudRate": 921600
 }
