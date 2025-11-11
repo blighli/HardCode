@@ -1,4 +1,0 @@
-{
-    "hexChecked": true,
-    "baudRate": 921600
-}

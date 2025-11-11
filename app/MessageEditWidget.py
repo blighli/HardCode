@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, QCheckBox
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QPushButton, QCheckBox
 from PyQt6.QtCore import pyqtSignal
 
 class MessageEditWidget(QWidget):
@@ -12,23 +12,40 @@ class MessageEditWidget(QWidget):
         layout = QHBoxLayout()
         self.setLayout(layout)
 
-        self.messageEdit = QLineEdit()
+        self.messageEdit = QComboBox()
+        self.messageEdit.setEditable(True)
         self.messageEdit.setFixedHeight(LINE_HEIGHT)
+        self.messageEdit.setStyleSheet("font-family: Consolas;")
+
         self.messageSendButton = QPushButton("发送")
         self.messageSendButton.setFixedWidth(100)
         self.messageSendButton.setFixedHeight(LINE_HEIGHT)
         self.messageSendButton.setEnabled(False)
         self.messageSendButton.clicked.connect(self.sendButtonClicked)
+
+        self.clearButton = QPushButton("清空")
+        self.clearButton.setFixedWidth(100)
+        self.clearButton.setFixedHeight(LINE_HEIGHT)
+        #self.messageSendButton.setEnabled(False)
+        self.clearButton.clicked.connect(self.clearButtonClicked)
         
         self.hexCheckBox = QCheckBox()
         self.hexCheckBox.setText("Hex")
 
-        layout.addWidget(self.messageEdit)
+        layout.addWidget(self.messageEdit, 1)
         layout.addWidget(self.messageSendButton)
+        layout.addWidget(self.clearButton)
         layout.addWidget(self.hexCheckBox)
 
     def sendButtonClicked(self):
-        self.message_send.emit(self.messageEdit.text())
+        message = self.messageEdit.currentText()
+        found = False
+        for i in range(self.messageEdit.count()):
+            if self.messageEdit.itemText(i) == message:
+                found = True
+        if not found:
+            self.messageEdit.addItem(message)
+        self.message_send.emit(message)
 
     def setButtonEnabled(self, enabled):
         self.messageSendButton.setEnabled(enabled)
@@ -38,3 +55,6 @@ class MessageEditWidget(QWidget):
     
     def setHexChecked(self, checked):
         self.hexCheckBox.setChecked(checked)
+
+    def clearButtonClicked(self):
+        self.messageEdit.clear()
