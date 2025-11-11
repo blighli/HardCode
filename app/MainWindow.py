@@ -145,6 +145,7 @@ class MainWindow(QMainWindow):
     def saveAppConfig(self):
         self.appConfig["hexChecked"] = self.messageEditWidget.isHexChecked()
         self.appConfig["baudRate"] = self.serialPortWidget.baudRate()
+        self.appConfig["msgHistory"] = self.messageEditWidget.history()
         with open(self.configFileName, 'w') as f:
             json.dump(self.appConfig, f, indent=4)
 
@@ -152,12 +153,14 @@ class MainWindow(QMainWindow):
     def loadAppConfig(self):
         self.appConfig = {
             "hexChecked" : False,
-            "baudRate" : 115200
+            "baudRate" : 115200,
+            "msgHistory": []
         }
         try:
             with open(self.configFileName, 'r') as f:
                 self.appConfig = json.load(f)
-        except:
-            print("App config file not exists!")
-        self.messageEditWidget.setHexChecked(self.appConfig["hexChecked"])
-        self.serialPortWidget.setBaudRate(self.appConfig["baudRate"])
+                self.messageEditWidget.setHexChecked(self.appConfig["hexChecked"])
+                self.serialPortWidget.setBaudRate(self.appConfig["baudRate"])
+                self.messageEditWidget.setHistory(self.appConfig["msgHistory"])
+        except Exception as e:
+            print(e)

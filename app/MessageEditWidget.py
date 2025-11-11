@@ -36,6 +36,12 @@ class MessageEditWidget(QWidget):
         layout.addWidget(self.messageSendButton)
         layout.addWidget(self.clearButton)
         layout.addWidget(self.hexCheckBox)
+    
+    def setHistory(self, items):
+        self.messageEdit.addItems(items)
+
+    def history(self):
+        return [self.messageEdit.itemText(i) for i in range(self.messageEdit.count())]
 
     def sendButtonClicked(self):
         message = self.messageEdit.currentText()
