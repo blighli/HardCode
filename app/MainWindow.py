@@ -53,9 +53,11 @@ class MainWindow(QMainWindow):
         self.serialPortWidget.port_open.connect(self.portOpen)
         self.serialPortWidget.port_close.connect(self.portClose)
         
+        # Message Display Widget
         self.messageDisplay = MessageDisplayWidget()
         leftBox.addWidget(self.messageDisplay)
 
+        # Message Edit Widget
         self.messageEditWidget = MessageEditWidget()
         self.messageEditWidget.message_send.connect(self.sendData)
         leftBox.addWidget(self.messageEditWidget)
@@ -68,10 +70,11 @@ class MainWindow(QMainWindow):
         self.readTable = MessageTableWidget()
         rightBox.addWidget(self.readTable)
 
-        self.graphicsWidget = GraphicsWidget()
-        self.graphicsWidget.setMinimumWidth(300)
-        self.graphicsWidget.setMinimumHeight(300)
-        rightBox.addWidget(self.graphicsWidget, 1)
+        # OpenGL Graphics Widget
+        # self.graphicsWidget = GraphicsWidget()
+        # self.graphicsWidget.setMinimumWidth(300)
+        # self.graphicsWidget.setMinimumHeight(300)
+        # rightBox.addWidget(self.graphicsWidget, 1)
         
          # Table View for Sent Data
         self.sendTable = MessageTableWidget()
@@ -86,7 +89,7 @@ class MainWindow(QMainWindow):
         exitAction.triggered.connect(self.close)
 
         toolsMenu = menuBar.addMenu("Tools")
-        drawAction = toolsMenu.addAction("Draw")
+        drawAction = toolsMenu.addAction("OpenGL Classic")
         drawAction.triggered.connect(self.openDrawWindow)
         settingsAction = toolsMenu.addAction("Settings")
 
