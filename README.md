@@ -22,7 +22,14 @@ pack.bat
 
 (uv run pyinstaller --add-binary "assets;assets" -i "assets\app.ico" -wF main.py -n %name% --clean)
 
-
+Linux:
+serial port open failed: Permission denied
+Solution: sudo usermod -a -G dialout <username>
+groups ${USER}
+sudo gpasswd --add ${USER} dialout
+newgrp dialout
+!!Important!!
+reboot
 
 memo:
 小米微电机串口控制指令,波特率921600

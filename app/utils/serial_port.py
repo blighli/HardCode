@@ -29,6 +29,7 @@ def connect(portInfo: QSerialPortInfo, baud_rate: int) -> QSerialPort | None:
     serialPort.setFlowControl(QSerialPort.FlowControl.NoFlowControl)
 
     if not serialPort.open(QSerialPort.OpenModeFlag.ReadWrite):
+        print("Serial Port Open Failed: " + serialPort.errorString())
         return None
     return serialPort
 
