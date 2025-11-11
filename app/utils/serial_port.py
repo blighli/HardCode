@@ -8,7 +8,6 @@ def get_port_names():
 
 def get_serial_ports():
     portList = QSerialPortInfo.availablePorts()
-    portList = sorted(portList, key=lambda port: eval(port.portName()[3:]))
     return [port for port in portList 
             if port.hasVendorIdentifier() 
             and port.hasProductIdentifier()
