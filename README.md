@@ -2,37 +2,44 @@
 
 Hardware Development Code Base
 
-note:
+# note:
 
-install uv: 
+## install uv: 
 
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-install pyinstaller (in venv!!!):
+## install pyinstaller (in venv!!!):
 
 uv pip install pyinstaller 
 
-run application:
+## run application:
 
 uv run main.py
 
-pack application in exe:
+## pack application in exe:
 
 pack.bat
 
 (uv run pyinstaller --add-binary "assets;assets" -i "assets\app.ico" -wF main.py -n %name% --clean)
 
-Linux:
+# Linux:
+
 serial port open failed: Permission denied
+```
 Solution: sudo usermod -a -G dialout <username>
 groups ${USER}
 sudo gpasswd --add ${USER} dialout
 newgrp dialout
+```
 !!Important!!
 reboot
 
-memo:
-小米微电机串口控制指令,波特率921600
+# memo:
+##小米微电机串口控制指令,波特率921600
+```
 jog+：41 54 90 07 eb fc 08 05 70 00 00 07 01 95 54 0d 0a
+
 jog停止：41 54 90 07 eb fc 08 05 70 00 00 07 00 7f ff 0d 0a
+
 jog-：41 54 90 07 eb fc 08 05 70 00 00 07 01 6a aa 0d 0a
+```
