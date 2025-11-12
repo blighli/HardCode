@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QPushButton, QCheckBox
 from PyQt6.QtCore import pyqtSignal
+import can
 
 class MessageEditWidget(QWidget):
 
@@ -51,6 +52,16 @@ class MessageEditWidget(QWidget):
                 found = True
         if not found:
             self.messageEdit.addItem(message)
+
+        #使用python-can发送报文
+        if message == "can":
+            can_msg = can.Message(
+                arbitration_id=0x123,
+                data=[0x01, 0x02, 0x03, 0x04],
+                is_extended_id=False
+            )
+            message = str(can_msg)
+
         self.message_send.emit(message)
 
     def setButtonEnabled(self, enabled):
