@@ -26,7 +26,7 @@ class SerialPortWidget(QWidget):
         self.baudRateComboBox = QComboBox()
         self.baudRateComboBox.setMinimumWidth(200)
         self.baudRateComboBox.setFixedHeight(LINE_HEIGHT)
-        self.baudRateComboBox.addItems(["9600", "19200", "38400", "57600", "115200", "230400", "460800", "500000", "921600"])
+        self.baudRateComboBox.addItems(["9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600"])
         self.baudRateComboBox.setCurrentIndex(4)  # Default to 115200
         # Connect Button
         self.portConnectButton = QPushButton("打开串口")
