@@ -6,6 +6,8 @@ class MessageTableWidget(QWidget):
         super(MessageTableWidget, self).__init__(parent)
 
         LINE_HEIGHT = 30
+
+        # type = bit int2 int4 int8 byte char
         tableHeaders = ["pos", "len", "type", "name", "value"]
 
         layout = QVBoxLayout(self)
@@ -86,3 +88,68 @@ class MessageTableWidget(QWidget):
             data.append(rowData)
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
+
+    
+    def encode(self):
+        data = []
+        for row in range(self.table.rowCount()):
+            item = self.table.item(row, 1)
+            itemText = item.text() if item else ""
+
+
+            len = self.table.item(row, 1).text() if self.table.item(row, 1) else ""
+            type = self.table.item(row, 2).text() if self.table.item(row, 2) else ""
+            value = self.table.item(row, 4).text() if self.table.item(row, 4) else ""
+            data.append({
+                "len": len,
+                "type": type,
+                "value": value
+            })
+        return data
+
+    def getFieldType(self, row):
+        item = self.table.item(row, 2)
+        text =  item.text() if item else ""
+        return text
+    
+    def getFieldLen(self, row):
+        item = self.table.item(row, 1)
+        text =  item.text() if item else ""
+        len = 0
+        if text.isdigit():
+            len = int(text)
+        return len
+    
+    def getFieldCharValue(self, row):
+        item = self.table.item(row, 4)
+        text =  item.text() if item else ""
+        value = b""
+        if self.getFieldType(row) == "char":
+            value = text.encode('utf-8')
+        return value
+        
+    def getFieldInt8Value(self, row):
+        item = self.table.item(row, 4)
+        text =  item.text() if item else ""
+        value = 0
+        if text.isdigit() or (text.startswith('-') and text[1:].isdigit()):
+            value = int(text).to_bytes(1, byteorder='big', signed=True)
+        return value
+    
+    def getFieldBitValue(self, row):
+        item = self.table.item(row, 4)
+        text =  item.text() if item else ""
+        value = b""
+        if all(c in '01' for c in text):
+            bits = text
+            while len(bits) % 8 != 0:
+                bits = '0' + bits
+            byteArray = bytearray()
+            for i in range(0, len(bits), 8):
+                byte = bits[i:i+8]
+                byteArray.append(int(byte, 2))
+            value = bytes(byteArray)
+        return value
+
+    def decode(self, data):
+        pass

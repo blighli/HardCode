@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox, QTableWidget, QTableWidgetItem, QFileDialog
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTabWidget, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox, QTableWidget, QTableWidgetItem, QFileDialog
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtCore import QByteArray
@@ -39,7 +39,13 @@ class MainWindow(QMainWindow):
 
         # Central Widget and Layouts
         central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+
+        self.tabWidget = QTabWidget()
+        self.tabWidget.addTab(central_widget, "Common")
+        self.tabWidget.addTab(GraphicsWidget(), "Graphics")
+        self.tabWidget.addTab(QWidget(), "CAN")
+
+        self.setCentralWidget(self.tabWidget)
         # Create Main Layouts
         mainBox = QHBoxLayout(central_widget)
         leftBox = QVBoxLayout()
@@ -88,9 +94,11 @@ class MainWindow(QMainWindow):
         exitAction = fileMenu.addAction("Exit")
         exitAction.triggered.connect(self.close)
 
-        toolsMenu = menuBar.addMenu("Tools")
-        drawAction = toolsMenu.addAction("OpenGL Classic")
+        viewsMenu = menuBar.addMenu("Views")
+        drawAction = viewsMenu.addAction("OpenGL Classic")
         drawAction.triggered.connect(self.openDrawWindow)
+
+        toolsMenu = menuBar.addMenu("Tools")
         settingsAction = toolsMenu.addAction("Settings")
 
         helpMenu = menuBar.addMenu("Help")
@@ -149,6 +157,7 @@ class MainWindow(QMainWindow):
         self.appConfig["hexChecked"] = self.messageEditWidget.isHexChecked()
         self.appConfig["baudRate"] = self.serialPortWidget.baudRate()
         self.appConfig["msgHistory"] = self.messageEditWidget.history()
+        self.appConfig["tabSelectedIndex"] = self.tabWidget.currentIndex()
         with open(self.configFileName, 'w') as f:
             json.dump(self.appConfig, f, indent=4)
 
@@ -165,5 +174,6 @@ class MainWindow(QMainWindow):
                 self.messageEditWidget.setHexChecked(self.appConfig["hexChecked"])
                 self.serialPortWidget.setBaudRate(self.appConfig["baudRate"])
                 self.messageEditWidget.setHistory(self.appConfig["msgHistory"])
+                self.tabWidget.setCurrentIndex(self.appConfig.get("tabSelectedIndex", 0))
         except Exception as e:
             print(e)
