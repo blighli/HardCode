@@ -3,14 +3,16 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort
 from PyQt6.QtCore import QByteArray
 
-from .GraphicsWidget import GraphicsWidget
 from .utils import assets_path
+from .GraphicsWidget import GraphicsWidget
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .SerialPortWidget import SerialPortWidget
 from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
 from .CommonWidget import CommonWidget
+from .CANWidget import CANWidget
+
 import json
 
 class MainWindow(QMainWindow):
@@ -20,7 +22,6 @@ class MainWindow(QMainWindow):
         self.api_server = FastAPIServer()
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
-        self.graphicsWidget: GraphicsWidget = None
         self.initUI()
         self.loadAppConfig()
     
@@ -35,7 +36,7 @@ class MainWindow(QMainWindow):
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
         self.setWindowTitle("Hello from HardCode!")
-        self.setGeometry(100, 100, 1200, 800)
+        self.setGeometry(100, 100, 1600, 1200)
 
         # Central Widget and Layouts
         central_widget = QWidget()
@@ -74,14 +75,14 @@ class MainWindow(QMainWindow):
         self.commonWidget = CommonWidget()
         self.tabWidget.addTab(self.commonWidget, "Common")
 
+        self.canWidget = CANWidget()
+        self.tabWidget.addTab(self.canWidget, "CAN")
 
-        self.tabWidget.addTab(QWidget(), "CAN")
-
-
-        self.tabWidget.addTab(GraphicsWidget(), "Graphics")
+        self.graphicsWidget = GraphicsWidget()
+        self.tabWidget.addTab(self.graphicsWidget, "Graphics")
 
         self.statusBar().showMessage("Ready!")
-        
+
 
     def createMenuBar(self):
         menuBar = self.menuBar()

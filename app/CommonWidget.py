@@ -5,15 +5,17 @@ class CommonWidget(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
         
-        self.layout = QVBoxLayout(self)
         # Table View for Received Data
         self.readTable = MessageTableWidget()
-        self.layout.addWidget(self.readTable)
+        layout.addWidget(self.readTable)
         
          # Table View for Sent Data
         self.sendTable = MessageTableWidget()
-        self.layout.addWidget(self.sendTable)
+        layout.addWidget(self.sendTable)
         
     def some_method(self):
         pass
