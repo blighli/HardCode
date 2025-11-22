@@ -1,17 +1,17 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTabWidget, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox, QTableWidget, QTableWidgetItem, QFileDialog
 from PyQt6.QtGui import QIcon
-from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
+from PyQt6.QtSerialPort import QSerialPort
 from PyQt6.QtCore import QByteArray
 
-from app.GraphicsWidget import GraphicsWidget
-from .utils import assets_path, serial_port
+from .GraphicsWidget import GraphicsWidget
+from .utils import assets_path
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
-from .MessageTableWidget import MessageTableWidget
 from .SerialPortWidget import SerialPortWidget
 from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
-import json,pickle
+from .CommonWidget import CommonWidget
+import json
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -39,13 +39,8 @@ class MainWindow(QMainWindow):
 
         # Central Widget and Layouts
         central_widget = QWidget()
+        self.setCentralWidget(central_widget)
 
-        self.tabWidget = QTabWidget()
-        self.tabWidget.addTab(central_widget, "Common")
-        self.tabWidget.addTab(GraphicsWidget(), "Graphics")
-        self.tabWidget.addTab(QWidget(), "CAN")
-
-        self.setCentralWidget(self.tabWidget)
         # Create Main Layouts
         mainBox = QHBoxLayout(central_widget)
         leftBox = QVBoxLayout()
@@ -72,21 +67,21 @@ class MainWindow(QMainWindow):
         self.rangeWidget.value_changed.connect(self.rangeValueChanged)
         leftBox.addWidget(self.rangeWidget)
 
-        # Table View for Received Data
-        self.readTable = MessageTableWidget()
-        rightBox.addWidget(self.readTable)
+        # Create Tab Widget
+        self.tabWidget = QTabWidget()
+        rightBox.addWidget(self.tabWidget)
+        
+        self.commonWidget = CommonWidget()
+        self.tabWidget.addTab(self.commonWidget, "Common")
 
-        # OpenGL Graphics Widget
-        # self.graphicsWidget = GraphicsWidget()
-        # self.graphicsWidget.setMinimumWidth(300)
-        # self.graphicsWidget.setMinimumHeight(300)
-        # rightBox.addWidget(self.graphicsWidget, 1)
-        
-         # Table View for Sent Data
-        self.sendTable = MessageTableWidget()
-        rightBox.addWidget(self.sendTable)
-        
+
+        self.tabWidget.addTab(QWidget(), "CAN")
+
+
+        self.tabWidget.addTab(GraphicsWidget(), "Graphics")
+
         self.statusBar().showMessage("Ready!")
+        
 
     def createMenuBar(self):
         menuBar = self.menuBar()
