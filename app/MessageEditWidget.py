@@ -33,10 +33,18 @@ class MessageEditWidget(QWidget):
         self.hexCheckBox = QCheckBox()
         self.hexCheckBox.setText("Hex")
 
+        self.crCheckBox = QCheckBox()
+        self.crCheckBox.setText("CR")
+
+        self.lfCheckBox = QCheckBox()
+        self.lfCheckBox.setText("LF")
+
         layout.addWidget(self.messageEdit, 1)
         layout.addWidget(self.messageSendButton)
         layout.addWidget(self.clearButton)
         layout.addWidget(self.hexCheckBox)
+        layout.addWidget(self.crCheckBox)
+        layout.addWidget(self.lfCheckBox)
     
     def setHistory(self, items):
         self.messageEdit.addItems(items)
@@ -63,6 +71,18 @@ class MessageEditWidget(QWidget):
     
     def setHexChecked(self, checked):
         self.hexCheckBox.setChecked(checked)
+
+    def isCarriageReturnChecked(self):
+        return self.crCheckBox.isChecked()
+    
+    def setCarriageReturnChecked(self, checked):
+        self.crCheckBox.setChecked(checked)
+
+    def isLineFeedChecked(self):
+        return self.lfCheckBox.isChecked()
+    
+    def setLineFeedChecked(self, checked):
+        self.lfCheckBox.setChecked(checked)
 
     def clearButtonClicked(self):
         self.messageEdit.clear()

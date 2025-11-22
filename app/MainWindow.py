@@ -144,6 +144,10 @@ class MainWindow(QMainWindow):
                     return
             else:
                 byteArray = QByteArray(data.encode('utf-8'))
+                if self.messageEditWidget.isCarriageReturnChecked():
+                    byteArray.append(b'\r')
+                if self.messageEditWidget.isLineFeedChecked():
+                    byteArray.append(b'\n')
             
             self.serialPort.write(byteArray)
             # Echo Sent Message
@@ -151,6 +155,8 @@ class MainWindow(QMainWindow):
     
     def saveAppConfig(self):
         self.appConfig["hexChecked"] = self.messageEditWidget.isHexChecked()
+        self.appConfig["carriageReturnChecked"] = self.messageEditWidget.isCarriageReturnChecked()
+        self.appConfig["lineFeedChecked"] = self.messageEditWidget.isLineFeedChecked()
         self.appConfig["baudRate"] = self.serialPortWidget.baudRate()
         self.appConfig["msgHistory"] = self.messageEditWidget.history()
         self.appConfig["tabSelectedIndex"] = self.tabWidget.currentIndex()
@@ -161,6 +167,8 @@ class MainWindow(QMainWindow):
     def loadAppConfig(self):
         self.appConfig = {
             "hexChecked" : False,
+            "carriageReturnChecked": False,
+            "lineFeedChecked": False,
             "baudRate" : 115200,
             "msgHistory": []
         }
@@ -168,6 +176,8 @@ class MainWindow(QMainWindow):
             with open(self.configFileName, 'r') as f:
                 self.appConfig = json.load(f)
                 self.messageEditWidget.setHexChecked(self.appConfig["hexChecked"])
+                self.messageEditWidget.setCarriageReturnChecked(self.appConfig["carriageReturnChecked"])
+                self.messageEditWidget.setLineFeedChecked(self.appConfig["lineFeedChecked"])
                 self.serialPortWidget.setBaudRate(self.appConfig["baudRate"])
                 self.messageEditWidget.setHistory(self.appConfig["msgHistory"])
                 self.tabWidget.setCurrentIndex(self.appConfig.get("tabSelectedIndex", 0))
