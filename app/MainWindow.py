@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
         self.setWindowTitle("Hello from HardCode!")
-        self.setGeometry(100, 100, 1600, 1200)
+        self.setGeometry(100, 100, 1600, 1000)
 
         # Central Widget and Layouts
         central_widget = QWidget()
