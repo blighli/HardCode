@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout
 from app.MessageEditWidget import MessageEditWidget
 
 class CyberGearWidget(QWidget):
@@ -8,30 +8,24 @@ class CyberGearWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QVBoxLayout()
-        layout.addSpacing(100)
-
-        buttonLayout = QHBoxLayout()
+        layout = QGridLayout()
 
         startButton = QPushButton("开始控制")
         startButton.setFixedWidth(100)
         startButton.clicked.connect(self.startControl)
-        buttonLayout.addWidget(startButton)
+        layout.addWidget(startButton, 1, 1)
 
         cwButton = QPushButton("正向运行")
         cwButton.setFixedWidth(100)
-        buttonLayout.addWidget(cwButton)
+        layout.addWidget(cwButton, 1, 3)
         cwButton.pressed.connect(self.runForward)
         cwButton.released.connect(self.stopRun)
 
         ccwButton = QPushButton("反向运行")
         ccwButton.setFixedWidth(100)
-        buttonLayout.addWidget(ccwButton)
+        layout.addWidget(ccwButton,1,5)
         ccwButton.pressed.connect(self.runBackward)
         ccwButton.released.connect(self.stopRun)
-
-        layout.addLayout(buttonLayout)
-        layout.addStretch()
         
         self.setLayout(layout)
 
