@@ -8,7 +8,7 @@ class MessageTableWidget(QWidget):
         LINE_HEIGHT = 30
 
         # type = bit int2 int4 int8 byte char
-        tableHeaders = ["pos", "len", "type", "name", "value"]
+        tableHeaders = ["len", "type", "name", "value"]
 
         layout = QVBoxLayout(self)
 
@@ -93,13 +93,30 @@ class MessageTableWidget(QWidget):
     def encode(self):
         data = []
         for row in range(self.table.rowCount()):
-            item = self.table.item(row, 1)
+
+            item = self.table.item(row, 0)
             itemText = item.text() if item else ""
+            len = int(itemText) if itemText.isdigit() else 0
 
-
-            len = self.table.item(row, 1).text() if self.table.item(row, 1) else ""
-            type = self.table.item(row, 2).text() if self.table.item(row, 2) else ""
-            value = self.table.item(row, 4).text() if self.table.item(row, 4) else ""
+            item = self.table.item(row, 1)
+            type = item.text() if item else ""
+            if type == "bit":
+                len = (len + 7) // 8  # Convert bits to bytes
+            elif type == "int2":
+                len = 2
+            elif type == "int4":
+                len = 4
+            elif type == "int8":
+                len = 8
+            elif type == "byte":
+                len = 1
+            elif type == "char":
+                pass
+            
+            item = self.table.item(row, 3)
+            itemText = item.text() if item else ""
+            value = b""
+            
             data.append({
                 "len": len,
                 "type": type,

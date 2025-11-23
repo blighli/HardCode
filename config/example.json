@@ -1,34 +1,29 @@
 [
     [
-        "0",
         "1",
         "byte",
         "id",
         "9"
     ],
     [
-        "1",
         "2",
-        "int",
+        "byte",
         "len",
         "10"
     ],
     [
-        "3",
         "10",
-        "str",
+        "char",
         "msg",
         "this is a good message"
     ],
     [
-        "13",
         "4",
-        "int",
+        "int8",
         "code",
         "9527"
     ],
     [
-        "17",
         "1",
         "byte",
         "crc",
