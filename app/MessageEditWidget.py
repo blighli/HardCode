@@ -27,7 +27,6 @@ class MessageEditWidget(QWidget):
         self.clearButton = QPushButton("清空")
         self.clearButton.setFixedWidth(100)
         self.clearButton.setFixedHeight(LINE_HEIGHT)
-        #self.messageSendButton.setEnabled(False)
         self.clearButton.clicked.connect(self.clearButtonClicked)
         
         self.hexCheckBox = QCheckBox()
@@ -51,6 +50,15 @@ class MessageEditWidget(QWidget):
 
     def history(self):
         return [self.messageEdit.itemText(i) for i in range(self.messageEdit.count())]
+    
+    def sendMessage(self, data, isHex=True, hasCR=True, hasLF=True):
+        if self.messageSendButton.isEnabled():
+            self.messageEdit.setCurrentText(data)
+            self.hexCheckBox.setChecked(isHex)
+            self.crCheckBox.setChecked(hasCR)
+            self.lfCheckBox.setChecked(hasLF)
+            self.sendButtonClicked()
+
 
     def sendButtonClicked(self):
         message = self.messageEdit.currentText()

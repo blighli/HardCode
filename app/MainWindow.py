@@ -12,6 +12,7 @@ from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
 from .CommonWidget import CommonWidget
 from .CANWidget import CANWidget
+from .CyberGearWidget import CyberGearWidget
 
 import json
 
@@ -73,13 +74,16 @@ class MainWindow(QMainWindow):
         rightBox.addWidget(self.tabWidget)
         
         self.commonWidget = CommonWidget()
-        self.tabWidget.addTab(self.commonWidget, "Common")
+        self.tabWidget.addTab(self.commonWidget, "通用")
 
-        self.canWidget = CANWidget()
-        self.tabWidget.addTab(self.canWidget, "CAN")
+        self.cyberGearWidget = CyberGearWidget(messenger=self.messageEditWidget)
+        self.tabWidget.addTab(self.cyberGearWidget, "小米电机")
+
+        # self.canWidget = CANWidget()
+        # self.tabWidget.addTab(self.canWidget, "CAN")
 
         self.graphicsWidget = GraphicsWidget()
-        self.tabWidget.addTab(self.graphicsWidget, "Graphics")
+        self.tabWidget.addTab(self.graphicsWidget, "图形")
 
         self.statusBar().showMessage("Ready!")
 
