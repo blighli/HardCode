@@ -220,8 +220,9 @@ class MessageTableWidget(QWidget):
                 pass
         # 将十六进制字符串列表合并成一个完整的十六进制字符串，并且每隔两位添加一个空格
         hexString = "".join(data).upper()
-        print("Encoded Data: ", " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2)))
-        return data
+        hexString = " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2))
+        print("Encoded Data: ", hexString)
+        return hexString
 
    
 
