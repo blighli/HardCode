@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
         self.tabWidget = QTabWidget()
         rightBox.addWidget(self.tabWidget)
         
-        self.commonWidget = CommonWidget()
+        self.commonWidget = CommonWidget(messenger=self.messageEditWidget)
         self.tabWidget.addTab(self.commonWidget, "通用")
 
         self.cyberGearWidget = CyberGearWidget(messenger=self.messageEditWidget)

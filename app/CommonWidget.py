@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QComboBox, QHeaderView, QLabel
 from PyQt6.QtCore import Qt
 import json
+from app.MessageEditWidget import MessageEditWidget
 
 HEADERS = ["Length", "Type", "Name", "Value", "Format"]
 TYPES = ["Byte","Bit"]
@@ -15,8 +16,9 @@ def createComboBox(items, currentText=""):
     return comboBox
 
 class CommonWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, messenger : MessageEditWidget = None):
         super(CommonWidget, self).__init__(parent)
+        self.messenger : MessageEditWidget = messenger
 
         LINE_HEIGHT = 30
         
@@ -285,6 +287,9 @@ class CommonWidget(QWidget):
         hexString = "".join(data).upper()
         self.setStatus(f"Encoded Data {len(hexString) // 2} bytes: {hexString}")
         hexString = " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2))
+
+        if self.messenger:
+            self.messenger.sendMessage(hexString)
         return hexString
 
    
