@@ -1,32 +1,37 @@
 [
     [
         "1",
-        "byte",
+        "Byte",
         "id",
-        "9"
+        "127",
+        "Dec"
     ],
     [
         "2",
-        "byte",
+        "Byte",
         "len",
-        "10"
-    ],
-    [
-        "10",
-        "char",
-        "msg",
-        "this is a good message"
+        "996",
+        "Dec"
     ],
     [
         "4",
-        "int8",
-        "code",
-        "9527"
+        "Byte",
+        "name",
+        "AAAA",
+        "Char"
     ],
     [
         "1",
-        "byte",
+        "Byte",
+        "code",
+        "BB",
+        "Hex"
+    ],
+    [
+        "1",
+        "Byte",
         "crc",
-        "42"
+        "10101010",
+        "Bin"
     ]
 ]

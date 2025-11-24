@@ -1,22 +1,31 @@
-from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog
+from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QComboBox, QHeaderView
 import json
+
+HEADERS = ["Length", "Type", "Name", "Value", "Format"]
+TYPES = ["Byte","Bit"]
+FORMATS = ["Dec","Char","Hex", "Bin" ]
+
+def createComboBox(items, currentText=""):
+    comboBox = QComboBox()
+    comboBox.addItems(items)
+    index = comboBox.findText(currentText)
+    if index >= 0:
+        comboBox.setCurrentIndex(index)
+    return comboBox
 
 class MessageTableWidget(QWidget):
     def __init__(self, parent=None):
         super(MessageTableWidget, self).__init__(parent)
 
         LINE_HEIGHT = 30
-
-        # type = bit int2 int4 int8 byte char
-        tableHeaders = ["len", "type", "name", "value"]
-
+        
         layout = QVBoxLayout(self)
 
         self.table = QTableWidget()
         layout.addWidget(self.table)
-        self.table.setColumnCount(len(tableHeaders))
-        self.table.setHorizontalHeaderLabels(tableHeaders)
-        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setColumnCount(len(HEADERS))
+        self.table.setHorizontalHeaderLabels(HEADERS)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         self.table.setRowCount(0)
 
         self.addButton = QPushButton("add")
@@ -38,6 +47,16 @@ class MessageTableWidget(QWidget):
         self.saveButton.setFixedWidth(100)
         self.saveButton.setFixedHeight(LINE_HEIGHT)
         self.saveButton.clicked.connect(self.saveTable)
+
+        self.encodeButton = QPushButton("encode")
+        self.encodeButton.setFixedWidth(100)
+        self.encodeButton.setFixedHeight(LINE_HEIGHT)
+        self.encodeButton.clicked.connect(self.encode)
+
+        self.decodeButton = QPushButton("decode")
+        self.decodeButton.setFixedWidth(100)
+        self.decodeButton.setFixedHeight(LINE_HEIGHT)
+        self.decodeButton.clicked.connect(self.decode)
         
         buttonBox = QHBoxLayout()
         buttonBox.addStretch()
@@ -45,14 +64,21 @@ class MessageTableWidget(QWidget):
         buttonBox.addWidget(self.delButton)
         buttonBox.addWidget(self.loadButton)
         buttonBox.addWidget(self.saveButton)
+        buttonBox.addWidget(self.encodeButton)
+        buttonBox.addWidget(self.decodeButton)
         buttonBox.addStretch()
         layout.addLayout(buttonBox)
 
     def addRow(self):
-        rowPosition = self.table.rowCount()
-        self.table.insertRow(rowPosition)
+        row = self.table.rowCount()
+        self.table.insertRow(row)
         for col in range(self.table.columnCount()):
-            self.table.setItem(rowPosition, col, QTableWidgetItem(""))
+            if self.table.horizontalHeaderItem(col).text() == "Type":
+                self.table.setCellWidget(row, col, createComboBox(TYPES))
+            elif self.table.horizontalHeaderItem(col).text() == "Format":
+                self.table.setCellWidget(row, col, createComboBox(FORMATS))
+            else:
+                self.table.setItem(row, col, QTableWidgetItem(""))
 
     def deleteRow(self):
         selectedRows = set()
@@ -72,7 +98,18 @@ class MessageTableWidget(QWidget):
         for row in data:
             self.addRow()
             for col, value in enumerate(row):
-                self.table.setItem(self.table.rowCount()-1, col, QTableWidgetItem(str(value)))
+                if self.table.horizontalHeaderItem(col).text() == "Type":
+                    comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
+                    index = comboBox.findText(value)
+                    if index >= 0:
+                        comboBox.setCurrentIndex(index)
+                elif self.table.horizontalHeaderItem(col).text() == "Format":
+                    comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
+                    index = comboBox.findText(value)
+                    if index >= 0:
+                        comboBox.setCurrentIndex(index)
+                else:
+                    self.table.setItem(self.table.rowCount()-1, col, QTableWidgetItem(str(value)))
 
     def saveTable(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "JSON Files (*.json);;All Files (*)")
@@ -83,8 +120,15 @@ class MessageTableWidget(QWidget):
         for row in range(self.table.rowCount()):
             rowData = []
             for col in range(self.table.columnCount()):
-                item = self.table.item(row, col)
-                rowData.append(item.text() if item else "")
+                if self.table.horizontalHeaderItem(col).text() == "Type":
+                    comboBox: QComboBox =  self.table.cellWidget(row, col)
+                    itemText = comboBox.currentText()
+                elif self.table.horizontalHeaderItem(col).text() == "Format":
+                    comboBox: QComboBox = self.table.cellWidget(row, col)
+                    itemText = comboBox.currentText()
+                else:
+                    itemText = self.table.item(row, col).text()
+                rowData.append(itemText if itemText else "")
             data.append(rowData)
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
@@ -93,80 +137,43 @@ class MessageTableWidget(QWidget):
     def encode(self):
         data = []
         for row in range(self.table.rowCount()):
-
-            item = self.table.item(row, 0)
-            itemText = item.text() if item else ""
-            len = int(itemText) if itemText.isdigit() else 0
-
-            item = self.table.item(row, 1)
-            type = item.text() if item else ""
-            if type == "bit":
-                len = (len + 7) // 8  # Convert bits to bytes
-            elif type == "int2":
-                len = 2
-            elif type == "int4":
-                len = 4
-            elif type == "int8":
-                len = 8
-            elif type == "byte":
-                len = 1
-            elif type == "char":
+            fieldLength = 0
+            fieldType = "Byte"
+            fieldFormat = "Dec"
+            fieldValue = ""
+            for col in range(self.table.columnCount()):
+                if self.table.horizontalHeaderItem(col).text() == "Length":
+                    fieldLength = self.table.item(row, col).text()
+                elif self.table.horizontalHeaderItem(col).text() == "Type":
+                    fieldType =  self.table.cellWidget(row, col).currentText()
+                elif self.table.horizontalHeaderItem(col).text() == "Format":
+                    fieldFormat =  self.table.cellWidget(row, col).currentText()
+                elif self.table.horizontalHeaderItem(col).text() == "Value":
+                    fieldValue = self.table.item(row, col).text()
+            # 处理这个字段的值，根据其表示格式把字段值从显示字符串转换成十六进制字符串，并且添加到data中，注意根据长度和类型进行处理
+            if fieldType == "Byte":
+                if fieldFormat == "Dec":
+                    intValue = int(fieldValue)
+                    hexValue = intValue.to_bytes(int(fieldLength), byteorder='big').hex()
+                    data.append(hexValue)
+                elif fieldFormat == "Hex":
+                    hexValue = fieldValue.replace(" ", "")
+                    data.append(hexValue)
+                elif fieldFormat == "Char":
+                    byteValue = fieldValue.encode('utf-8')
+                    hexValue = byteValue.hex()
+                    data.append(hexValue)
+                elif fieldFormat == "Bin":
+                    intValue = int(fieldValue, 2)
+                    hexValue = intValue.to_bytes(int(fieldLength), byteorder='big').hex()
+                    data.append(hexValue)
+            elif fieldType == "Bit":
+                # 位类型处理，可以根据需要进行扩展
                 pass
-            
-            item = self.table.item(row, 3)
-            itemText = item.text() if item else ""
-            value = b""
-            
-            data.append({
-                "len": len,
-                "type": type,
-                "value": value
-            })
+        print("Encoded Data: ", " ".join(data))
         return data
 
-    def getFieldType(self, row):
-        item = self.table.item(row, 2)
-        text =  item.text() if item else ""
-        return text
-    
-    def getFieldLen(self, row):
-        item = self.table.item(row, 1)
-        text =  item.text() if item else ""
-        len = 0
-        if text.isdigit():
-            len = int(text)
-        return len
-    
-    def getFieldCharValue(self, row):
-        item = self.table.item(row, 4)
-        text =  item.text() if item else ""
-        value = b""
-        if self.getFieldType(row) == "char":
-            value = text.encode('utf-8')
-        return value
-        
-    def getFieldInt8Value(self, row):
-        item = self.table.item(row, 4)
-        text =  item.text() if item else ""
-        value = 0
-        if text.isdigit() or (text.startswith('-') and text[1:].isdigit()):
-            value = int(text).to_bytes(1, byteorder='big', signed=True)
-        return value
-    
-    def getFieldBitValue(self, row):
-        item = self.table.item(row, 4)
-        text =  item.text() if item else ""
-        value = b""
-        if all(c in '01' for c in text):
-            bits = text
-            while len(bits) % 8 != 0:
-                bits = '0' + bits
-            byteArray = bytearray()
-            for i in range(0, len(bits), 8):
-                byte = bits[i:i+8]
-                byteArray.append(int(byte, 2))
-            value = bytes(byteArray)
-        return value
+   
 
     def decode(self, data):
         pass
