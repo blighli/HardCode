@@ -4,21 +4,21 @@
         "Byte",
         "id",
         "127",
-        "Dec"
+        "Int"
     ],
     [
         "2",
         "Byte",
         "len",
         "996",
-        "Dec"
+        "Int"
     ],
     [
         "4",
         "Byte",
         "name",
         "AAAA",
-        "Char"
+        "String"
     ],
     [
         "1",
@@ -32,6 +32,13 @@
         "Byte",
         "crc",
         "10101010",
-        "Bin"
+        "Binary"
+    ],
+    [
+        "4",
+        "Byte",
+        "height",
+        "176.00",
+        "Float"
     ]
 ]

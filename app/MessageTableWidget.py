@@ -3,7 +3,7 @@ import json
 
 HEADERS = ["Length", "Type", "Name", "Value", "Format"]
 TYPES = ["Byte","Bit"]
-FORMATS = ["Dec","Char","Hex", "Bin" ]
+FORMATS = ["Int", "Float", "String","Hex", "Binary" ]
 
 def createComboBox(items, currentText=""):
     comboBox = QComboBox()
@@ -139,7 +139,7 @@ class MessageTableWidget(QWidget):
         for row in range(self.table.rowCount()):
             fieldLength = 0
             fieldType = "Byte"
-            fieldFormat = "Dec"
+            fieldFormat = "Int"
             fieldName = ""
             fieldValue = ""
             for col in range(self.table.columnCount()):
@@ -156,7 +156,7 @@ class MessageTableWidget(QWidget):
                     fieldValue = self.table.item(row, col).text()
             # 处理这个字段的值，根据其表示格式把字段值从显示字符串转换成十六进制字符串，并且添加到data中，注意根据长度和类型进行处理
             if fieldType == "Byte":
-                if fieldFormat == "Dec":
+                if fieldFormat == "Int":
                     try:
                         intValue = int(fieldValue)
                         bitLength = intValue.bit_length()
@@ -168,7 +168,29 @@ class MessageTableWidget(QWidget):
                         hexValue = intValue.to_bytes(fieldLength, byteorder='big').hex()
                         data.append(hexValue)
                     except ValueError:
-                        error = f"Error: {fieldName}={fieldValue} is not a valid decimal number"
+                        error = f"Error: {fieldName}={fieldValue} is not a valid integer"
+                        print(error)
+                        return error
+                    
+                if fieldFormat == "Float":
+                    try:
+                        import struct
+                        floatValue = float(fieldValue)
+                        if fieldLength == 4:
+                            hexValue = struct.pack('>f', floatValue).hex()
+                        elif fieldLength == 8:
+                            hexValue = struct.pack('>d', floatValue).hex()
+                        else:
+                            error = f"Error: {fieldName}={fieldValue} has unsupported length {fieldLength} for Float"
+                            print(error)
+                            return error
+                        data.append(hexValue)
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid float"
+                        print(error)
+                        return error
+                    except struct.error:
+                        error = f"Error: {fieldName}={fieldValue} struct packing error"
                         print(error)
                         return error
 
@@ -189,7 +211,7 @@ class MessageTableWidget(QWidget):
                         print(error)
                         return error
 
-                elif fieldFormat == "Char":
+                elif fieldFormat == "String":
                     byteValue = fieldValue.encode('utf-8')
                     if len(byteValue) > fieldLength:
                         error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bytes"
@@ -199,7 +221,7 @@ class MessageTableWidget(QWidget):
                     byteValue = byteValue.ljust(fieldLength, b'\x00')
                     hexValue = byteValue.hex()
                     data.append(hexValue)
-                elif fieldFormat == "Bin":
+                elif fieldFormat == "Binary":
                     try:
                         intValue = int(fieldValue, 2)
                         bitLength = intValue.bit_length()
