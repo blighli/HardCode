@@ -77,4 +77,4 @@ class SerialPortWidget(QWidget):
             self.portConnectButton.setText("关闭串口")
             self.port_open.emit(self.serialPort)
         else:
-            QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port.portName()} at {baud_rate} baud.")
+            QMessageBox.critical(self, "Connection Error", f"Failed to connect to {port.portName() if port else "empty port"} at {baud_rate} baud.")
