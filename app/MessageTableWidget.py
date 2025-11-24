@@ -140,37 +140,87 @@ class MessageTableWidget(QWidget):
             fieldLength = 0
             fieldType = "Byte"
             fieldFormat = "Dec"
+            fieldName = ""
             fieldValue = ""
             for col in range(self.table.columnCount()):
                 if self.table.horizontalHeaderItem(col).text() == "Length":
                     fieldLength = self.table.item(row, col).text()
+                    fieldLength = int(fieldLength) if fieldLength.isdigit() else 0
                 elif self.table.horizontalHeaderItem(col).text() == "Type":
                     fieldType =  self.table.cellWidget(row, col).currentText()
                 elif self.table.horizontalHeaderItem(col).text() == "Format":
                     fieldFormat =  self.table.cellWidget(row, col).currentText()
+                elif self.table.horizontalHeaderItem(col).text() == "Name":
+                    fieldName = self.table.item(row, col).text()
                 elif self.table.horizontalHeaderItem(col).text() == "Value":
                     fieldValue = self.table.item(row, col).text()
             # 处理这个字段的值，根据其表示格式把字段值从显示字符串转换成十六进制字符串，并且添加到data中，注意根据长度和类型进行处理
             if fieldType == "Byte":
                 if fieldFormat == "Dec":
-                    intValue = int(fieldValue)
-                    hexValue = intValue.to_bytes(int(fieldLength), byteorder='big').hex()
-                    data.append(hexValue)
+                    try:
+                        intValue = int(fieldValue)
+                        bitLength = intValue.bit_length()
+                        byteLength = (bitLength + 7) // 8
+                        if byteLength > fieldLength:
+                            error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bytes"
+                            print(error)
+                            return error
+                        hexValue = intValue.to_bytes(fieldLength, byteorder='big').hex()
+                        data.append(hexValue)
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid decimal number"
+                        print(error)
+                        return error
+
                 elif fieldFormat == "Hex":
-                    hexValue = fieldValue.replace(" ", "")
-                    data.append(hexValue)
+                    try:
+                        if fieldValue.startswith("0x") or fieldValue.startswith("0X"):
+                            fieldValue = fieldValue[2:]
+                        hexValue = fieldValue.replace(" ", "")
+                        # 判断fieldValue是否是合法的十六进制字符串
+                        bytes.fromhex(hexValue)
+                        if len(hexValue) != fieldLength * 2:
+                            error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bytes"
+                            print(error)
+                            return error
+                        data.append(hexValue)
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid hexadecimal string"
+                        print(error)
+                        return error
+
                 elif fieldFormat == "Char":
                     byteValue = fieldValue.encode('utf-8')
+                    if len(byteValue) > fieldLength:
+                        error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bytes"
+                        print(error)
+                        return error
+                    # 如果不足长度，进行补0处理
+                    byteValue = byteValue.ljust(fieldLength, b'\x00')
                     hexValue = byteValue.hex()
                     data.append(hexValue)
                 elif fieldFormat == "Bin":
-                    intValue = int(fieldValue, 2)
-                    hexValue = intValue.to_bytes(int(fieldLength), byteorder='big').hex()
-                    data.append(hexValue)
+                    try:
+                        intValue = int(fieldValue, 2)
+                        bitLength = intValue.bit_length()
+                        byteLength = (bitLength + 7) // 8
+                        if byteLength != fieldLength:
+                            error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bytes"
+                            print(error)
+                            return error
+                        hexValue = intValue.to_bytes(fieldLength, byteorder='big').hex()
+                        data.append(hexValue)                     
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid binary string"
+                        print(error)
+                        return error
+
             elif fieldType == "Bit":
                 # 位类型处理，可以根据需要进行扩展
                 pass
-        print("Encoded Data: ", " ".join(data))
+        # 将十六进制字符串列表合并成一个完整的十六进制字符串，并且每隔两位添加一个空格
+        hexString = "".join(data).upper()
+        print("Encoded Data: ", " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2)))
         return data
 
    
