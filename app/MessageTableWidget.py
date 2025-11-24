@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QComboBox, QHeaderView
+from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QComboBox, QHeaderView, QLabel
 import json
 
 HEADERS = ["Length", "Type", "Name", "Value", "Format"]
@@ -27,6 +27,9 @@ class MessageTableWidget(QWidget):
         self.table.setHorizontalHeaderLabels(HEADERS)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         self.table.setRowCount(0)
+
+        self.statusLabel = QLabel("")
+        layout.addWidget(self.statusLabel)
 
         self.addButton = QPushButton("add")
         self.addButton.setFixedWidth(100)
@@ -68,6 +71,9 @@ class MessageTableWidget(QWidget):
         buttonBox.addWidget(self.decodeButton)
         buttonBox.addStretch()
         layout.addLayout(buttonBox)
+
+    def setStatus(self, message):
+        self.statusLabel.setText(message)
 
     def addRow(self):
         row = self.table.rowCount()
@@ -164,14 +170,14 @@ class MessageTableWidget(QWidget):
                         byteLength = (bitLength + 7) // 8
                         if byteLength > fieldLength:
                             error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bytes"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         hexValue = intValue.to_bytes(fieldLength, byteorder='big').hex()
                         data.append(hexValue)
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid integer"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
                     
                 if fieldFormat == "Float":
                     try:
@@ -183,17 +189,17 @@ class MessageTableWidget(QWidget):
                             hexValue = struct.pack('>d', floatValue).hex()
                         else:
                             error = f"Error: {fieldName}={fieldValue} has unsupported length {fieldLength} for Float"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         data.append(hexValue)
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid float"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
                     except struct.error:
                         error = f"Error: {fieldName}={fieldValue} struct packing error"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
 
                 elif fieldFormat == "Hex":
                     try:
@@ -204,20 +210,20 @@ class MessageTableWidget(QWidget):
                         bytes.fromhex(hexValue)
                         if len(hexValue) != fieldLength * 2:
                             error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bytes"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         data.append(hexValue)
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid hexadecimal string"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
 
                 elif fieldFormat == "String":
                     byteValue = fieldValue.encode('utf-8')
                     if len(byteValue) > fieldLength:
                         error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bytes"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
                     # 如果不足长度，进行补0处理
                     byteValue = byteValue.ljust(fieldLength, b'\x00')
                     hexValue = byteValue.hex()
@@ -229,14 +235,14 @@ class MessageTableWidget(QWidget):
                         byteLength = (bitLength + 7) // 8
                         if byteLength != fieldLength:
                             error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bytes"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         hexValue = intValue.to_bytes(fieldLength, byteorder='big').hex()
                         data.append(hexValue)                     
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid binary string"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
 
             elif fieldType == "Bit":
                 if fieldFormat == "Int":
@@ -245,8 +251,8 @@ class MessageTableWidget(QWidget):
                         bitLength = intValue.bit_length()
                         if bitLength > fieldLength:
                             error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bits"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         bitString += f"{intValue:0{fieldLength}b}"
                         if len(bitString) >= 8:
                             byteCount = len(bitString) // 8
@@ -258,16 +264,16 @@ class MessageTableWidget(QWidget):
                             bitString = bitString[byteCount*8:]
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid integer"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
                 elif fieldFormat == "Binary":
                     try:
                         intValue = int(fieldValue, 2)
                         bitLength = intValue.bit_length()
                         if bitLength != fieldLength:
                             error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bits"
-                            print(error)
-                            return error
+                            self.setStatus(error)
+                            return None
                         bitString += f"{intValue:0{fieldLength}b}"
                         if len(bitString) >= 8:
                             byteCount = len(bitString) // 8
@@ -279,21 +285,21 @@ class MessageTableWidget(QWidget):
                             bitString = bitString[byteCount*8:]                                         
                     except ValueError:
                         error = f"Error: {fieldName}={fieldValue} is not a valid binary string"
-                        print(error)
-                        return error
+                        self.setStatus(error)
+                        return None
                 else:
                     error = f"Error: Unsupported format {fieldFormat} for Bit type"
-                    print(error)
-                    return error
+                    self.setStatus(error)
+                    return None
         # 处理剩余的bitString
         if len(bitString) > 0:
             error = f"Error: Remaining bits {bitString} do not form a complete byte"
-            print(error)
-            return error
+            self.setStatus(error)
+            return None
         # 将十六进制字符串列表合并成一个完整的十六进制字符串，并且每隔两位添加一个空格
         hexString = "".join(data).upper()
+        self.setStatus(f"Encoded Data {len(hexString) // 2} bytes: {hexString}")
         hexString = " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2))
-        print("Encoded Data: ", hexString)
         return hexString
 
    
