@@ -136,6 +136,7 @@ class MessageTableWidget(QWidget):
     
     def encode(self):
         data = []
+        bitString = ""
         for row in range(self.table.rowCount()):
             fieldLength = 0
             fieldType = "Byte"
@@ -238,8 +239,51 @@ class MessageTableWidget(QWidget):
                         return error
 
             elif fieldType == "Bit":
-                # 位类型处理，可以根据需要进行扩展
-                pass
+                if fieldFormat == "Int":
+                    try:
+                        intValue = int(fieldValue)
+                        bitLength = intValue.bit_length()
+                        if bitLength > fieldLength:
+                            error = f"Error: {fieldName}={fieldValue} exceeds the specified length of {fieldLength} bits"
+                            print(error)
+                            return error
+                        bitString += f"{intValue:0{fieldLength}b}"
+                        if len(bitString) >= 8:
+                            byteCount = len(bitString) // 8
+                            for i in range(byteCount):
+                                byteBits = bitString[i*8:(i+1)*8]
+                                byteValue = int(byteBits, 2)
+                                hexValue = f"{byteValue:02x}"
+                                data.append(hexValue)
+                            bitString = bitString[byteCount*8:]
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid integer"
+                        print(error)
+                        return error
+                elif fieldFormat == "Binary":
+                    try:
+                        intValue = int(fieldValue, 2)
+                        bitLength = intValue.bit_length()
+                        if bitLength != fieldLength:
+                            error = f"Error: {fieldName}={fieldValue} not the specified length of {fieldLength} bits"
+                            print(error)
+                            return error
+                        bitString += f"{intValue:0{fieldLength}b}"
+                        if len(bitString) >= 8:
+                            byteCount = len(bitString) // 8
+                            for i in range(byteCount):
+                                byteBits = bitString[i*8:(i+1)*8]
+                                byteValue = int(byteBits, 2)
+                                hexValue = f"{byteValue:02x}"
+                                data.append(hexValue)
+                            bitString = bitString[byteCount*8:]                                         
+                    except ValueError:
+                        error = f"Error: {fieldName}={fieldValue} is not a valid binary string"
+                        print(error)
+                        return error
+
+
+
         # 将十六进制字符串列表合并成一个完整的十六进制字符串，并且每隔两位添加一个空格
         hexString = "".join(data).upper()
         hexString = " ".join(hexString[i:i+2] for i in range(0, len(hexString), 2))
