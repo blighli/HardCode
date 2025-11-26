@@ -86,8 +86,11 @@ class MainWindow(QMainWindow):
         # self.canWidget = CANWidget()
         # self.tabWidget.addTab(self.canWidget, "CAN")
 
-        #self.graphicsWidget = GraphicsWidget()
-        #self.tabWidget.addTab(self.graphicsWidget, "图形")
+        self.graphicsWidget = GraphicsWidget()
+        self.tabWidget.addTab(self.graphicsWidget, "图形")
+
+        self.visionWidget = VisionWidget()
+        self.tabWidget.addTab(self.visionWidget, "视觉")
 
         self.statusBar().showMessage("Ready!")
 
