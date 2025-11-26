@@ -1,0 +1,37 @@
+[
+    [
+        "2",
+        "Byte",
+        "FrameHead",
+        "0x493B",
+        "Hex"
+    ],
+    [
+        "1",
+        "Byte",
+        "Function",
+        "0",
+        "Int"
+    ],
+    [
+        "1",
+        "Byte",
+        "R/W",
+        "0",
+        "Int"
+    ],
+    [
+        "16",
+        "Byte",
+        "Data",
+        "0",
+        "Int"
+    ],
+    [
+        "2",
+        "Byte",
+        "FrameEnd",
+        "0x452E",
+        "Hex"
+    ]
+]
