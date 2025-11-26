@@ -5,6 +5,8 @@ from PyQt6.QtCore import QByteArray
 
 from .utils import assets_path
 from .GraphicsWidget import GraphicsWidget
+from .VisionWidget import VisionWidget
+
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .SerialPortWidget import SerialPortWidget
@@ -32,6 +34,8 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def initUI(self):
+        self.graphicsWidget: GraphicsWidget = None
+        self.visionWidget: VisionWidget = None
         self.createMenuBar()
         LINE_HEIGHT = 30
         # Main Window Settings
@@ -82,8 +86,8 @@ class MainWindow(QMainWindow):
         # self.canWidget = CANWidget()
         # self.tabWidget.addTab(self.canWidget, "CAN")
 
-        self.graphicsWidget = GraphicsWidget()
-        self.tabWidget.addTab(self.graphicsWidget, "图形")
+        #self.graphicsWidget = GraphicsWidget()
+        #self.tabWidget.addTab(self.graphicsWidget, "图形")
 
         self.statusBar().showMessage("Ready!")
 
@@ -95,8 +99,10 @@ class MainWindow(QMainWindow):
         exitAction.triggered.connect(self.close)
 
         viewsMenu = menuBar.addMenu("Views")
-        drawAction = viewsMenu.addAction("OpenGL Classic")
+        drawAction = viewsMenu.addAction("OpenGL")
         drawAction.triggered.connect(self.openDrawWindow)
+        visionAction = viewsMenu.addAction("Vision")
+        visionAction.triggered.connect(self.openVisionWindow)
 
         toolsMenu = menuBar.addMenu("Tools")
         settingsAction = toolsMenu.addAction("Settings")
@@ -105,11 +111,18 @@ class MainWindow(QMainWindow):
         aboutAction = helpMenu.addAction("About")
 
     def openDrawWindow(self):
-        if self.graphicsWidget is None:
+        if self.visionWidget is None:
             self.graphicsWidget = GraphicsWidget()
             self.graphicsWidget.setWindowTitle("OpenGL Draw Window")
             self.graphicsWidget.setGeometry(150, 150, 800, 600)
         self.graphicsWidget.show()
+
+    def openVisionWindow(self):
+        if self.visionWidget is None:
+            self.visionWidget = VisionWidget()
+            self.visionWidget.setWindowTitle("Vision Window")
+            self.visionWidget.setGeometry(200, 200, 800, 600)
+        self.visionWidget.show()
 
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")
