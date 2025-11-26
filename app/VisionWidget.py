@@ -38,11 +38,18 @@ class VisionWidget(QWidget):
 
 
     def capture_image(self):
+        if self.videoCapture is not None and self.videoCapture.isOpened():
+            self.killTimer(self.timer)
+            self.videoCapture.release()
+            self.captureButton.setText("打开摄像头")
+            return
+        
         self.videoCapture = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # 打开摄像头
         if not self.videoCapture.isOpened():
             QMessageBox.critical(self, "错误", "无法打开摄像头！", QMessageBox.StandardButton.Ok)
             return
         self.timer = self.startTimer(100)  # 每100毫秒捕获一次图像
+        self.captureButton.setText("关闭摄像头")
 
     def timerEvent(self, event):
         ret, frame = self.videoCapture.read()
