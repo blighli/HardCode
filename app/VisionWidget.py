@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QMessageBox, QLabel, QVBoxLayout,QHBoxLayout, QPushButton, QTimer
+from PyQt6.QtWidgets import QWidget, QMessageBox, QLabel, QVBoxLayout,QHBoxLayout, QPushButton
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import Qt
 import cv2
