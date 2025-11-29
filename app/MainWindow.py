@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
         self.setWindowTitle("Hello from HardCode!")
-        self.setGeometry(100, 100, 1200, 800)
+        self.resize(1200, 800)
 
         # Central Widget and Layouts
         central_widget = QWidget()
@@ -69,9 +69,9 @@ class MainWindow(QMainWindow):
         self.messageEditWidget.message_send.connect(self.sendData)
         leftBox.addWidget(self.messageEditWidget)
 
-        self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
-        self.rangeWidget.value_changed.connect(self.rangeValueChanged)
-        leftBox.addWidget(self.rangeWidget)
+        # self.rangeWidget = RangeWidget(minValue=0, maxValue=100, value=50)
+        # self.rangeWidget.value_changed.connect(self.rangeValueChanged)
+        # leftBox.addWidget(self.rangeWidget)
 
         # Create Tab Widget
         self.tabWidget = QTabWidget()
@@ -87,9 +87,11 @@ class MainWindow(QMainWindow):
         # self.tabWidget.addTab(self.canWidget, "CAN")
 
         self.graphicsWidget = GraphicsWidget()
+        self.graphicsWidget.setMinimumWidth(800)
         self.tabWidget.addTab(self.graphicsWidget, "图形")
 
         self.visionWidget = VisionWidget()
+        self.visionWidget.setMinimumWidth(800)
         self.tabWidget.addTab(self.visionWidget, "视觉")
 
         self.statusBar().showMessage("Ready!")
@@ -114,18 +116,16 @@ class MainWindow(QMainWindow):
         aboutAction = helpMenu.addAction("About")
 
     def openDrawWindow(self):
-        if self.visionWidget is None:
-            self.graphicsWidget = GraphicsWidget()
-            self.graphicsWidget.setWindowTitle("OpenGL Draw Window")
-            self.graphicsWidget.setGeometry(150, 150, 800, 600)
-        self.graphicsWidget.show()
+        self.graphicsWidget2 = GraphicsWidget()
+        self.graphicsWidget2.setWindowTitle("OpenGL Draw Window")
+        self.graphicsWidget2.setGeometry(150, 150, 800, 600)
+        self.graphicsWidget2.show()
 
     def openVisionWindow(self):
-        if self.visionWidget is None:
-            self.visionWidget = VisionWidget()
-            self.visionWidget.setWindowTitle("Vision Window")
-            self.visionWidget.setGeometry(200, 200, 800, 600)
-        self.visionWidget.show()
+        self.visionWidget2 = VisionWidget()
+        self.visionWidget2.setWindowTitle("Vision Window")
+        self.visionWidget2.setGeometry(200, 200, 800, 600)
+        self.visionWidget2.show()
 
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")
