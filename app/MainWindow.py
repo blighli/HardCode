@@ -100,6 +100,10 @@ class MainWindow(QMainWindow):
     def createMenuBar(self):
         menuBar = self.menuBar()
         fileMenu = menuBar.addMenu("File")
+        openSerialAction = fileMenu.addAction("Open Serial")
+        openSerialAction.triggered.connect(self.openSerialPortDialog)
+        openSocketAction = fileMenu.addAction("Open Socket")
+        openSocketAction.triggered.connect(self.openSocketDialog)
         exitAction = fileMenu.addAction("Exit")
         exitAction.triggered.connect(self.close)
 
@@ -114,6 +118,15 @@ class MainWindow(QMainWindow):
 
         helpMenu = menuBar.addMenu("Help")
         aboutAction = helpMenu.addAction("About")
+
+
+    def openSerialPortDialog(self):
+        pass
+
+
+    def openSocketDialog(self):
+        pass
+
 
     def openDrawWindow(self):
         self.graphicsWidget2 = GraphicsWidget()
