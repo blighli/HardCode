@@ -69,11 +69,18 @@ class SocketPortWidget(QWidget):
                     self.portEdit.setEnabled(False)
                     self.connectButton.setText("断开")
                     self.port_open.emit(self.socket)
+                    self.socket.disconnected.connect(self.socketDisconnected)
                 except Exception as e:
                     QMessageBox.warning(self, "连接异常", str(e))
                     self.socket = None
                     return
-        
+    
+    def socketDisconnected(self):
+        self.socket = None
+        self.ipBox.setEnabled(True)
+        self.portEdit.setEnabled(True)
+        self.connectButton.setText("连接")
+        self.port_close.emit()
 
 
     def ipAddress(self):

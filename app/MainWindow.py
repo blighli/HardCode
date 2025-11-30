@@ -201,6 +201,7 @@ class MainWindow(QMainWindow):
                     QMessageBox.critical(self, "Send Data Error", f"Not hex format data {data}") 
                     return
             else:
+                data = data.replace('<CR>', '\r').replace('<LF>', '\n')
                 byteArray = QByteArray(data.encode('utf-8'))
                 if self.messageEditWidget.isCarriageReturnChecked():
                     byteArray.append(b'\r')
