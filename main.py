@@ -5,6 +5,7 @@ import sys, os
 
 def main():
     app = QApplication([])
+    app.setStyle("Fusion")
     window = MainWindow()
     window.show()
     app.exec()

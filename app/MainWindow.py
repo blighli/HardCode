@@ -10,6 +10,7 @@ from .VisionWidget import VisionWidget
 from .RangeWidget import RangeWidget
 from .WebService import FastAPIServer
 from .SerialPortWidget import SerialPortWidget
+from .SocketPortWidget import SocketPortWidget
 from .MessageDisplayWidget import MessageDisplayWidget
 from .MessageEditWidget import MessageEditWidget
 from .CommonWidget import CommonWidget
@@ -54,15 +55,20 @@ class MainWindow(QMainWindow):
         mainBox.addLayout(leftBox)
         mainBox.addLayout(rightBox)
 
+        self.portTabWidget = QTabWidget()
         # Select Serial Port
         self.serialPortWidget = SerialPortWidget()
-        leftBox.addWidget(self.serialPortWidget)
         self.serialPortWidget.port_open.connect(self.portOpen)
         self.serialPortWidget.port_close.connect(self.portClose)
-        
+        self.portTabWidget.addTab(self.serialPortWidget, "串口")
+        # Select Socket Port
+        self.socketPortWidget = SocketPortWidget()
+        self.portTabWidget.addTab(self.socketPortWidget, "网络")
+        leftBox.addWidget(self.portTabWidget)
+
         # Message Display Widget
         self.messageDisplay = MessageDisplayWidget()
-        leftBox.addWidget(self.messageDisplay)
+        leftBox.addWidget(self.messageDisplay,stretch=1)
 
         # Message Edit Widget
         self.messageEditWidget = MessageEditWidget()
