@@ -45,6 +45,8 @@ class SocketPortWidget(QWidget):
         # Implement connection logic here
         if self.socket and self.socket.state() == QTcpSocket.SocketState.ConnectedState:
             self.socket.disconnectFromHost()
+            self.ipBox.setEnabled(True)
+            self.portEdit.setEnabled(True)
             self.connectButton.setText("连接")
             self.socket = None
             self.port_close.emit()
@@ -63,6 +65,8 @@ class SocketPortWidget(QWidget):
                         QMessageBox.warning(self, "连接失败", f"无法连接到 {self.ipAddress()}:{self.portNumber()}")
                         self.socket = None
                         return
+                    self.ipBox.setEnabled(False)
+                    self.portEdit.setEnabled(False)
                     self.connectButton.setText("断开")
                     self.port_open.emit(self.socket)
                 except Exception as e:

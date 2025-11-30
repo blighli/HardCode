@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTabWidget, QTextEdit, QLineEdit, QPushButton, QLabel, QComboBox, QMessageBox, QCheckBox, QTableWidget, QTableWidgetItem, QFileDialog
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSerialPort import QSerialPort
+from PyQt6.QtNetwork import QTcpSocket
+
 from PyQt6.QtCore import QByteArray
 
 from .utils import assets_path
@@ -26,6 +28,7 @@ class MainWindow(QMainWindow):
         self.api_server = FastAPIServer()
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
+        self.socketPort: QTcpSocket | None = None
         self.initUI()
         self.loadAppConfig()
     
@@ -64,6 +67,8 @@ class MainWindow(QMainWindow):
         # Select Socket Port
         self.socketPortWidget = SocketPortWidget()
         self.portTabWidget.addTab(self.socketPortWidget, "网络")
+        self.socketPortWidget.port_open.connect(self.socketOpen)
+        self.socketPortWidget.port_close.connect(self.socketClose)
         leftBox.addWidget(self.portTabWidget)
 
         # Message Display Widget
@@ -149,32 +154,46 @@ class MainWindow(QMainWindow):
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")
 
+    def socketOpen(self, socket: QTcpSocket):
+        self.socketPort = socket
+        self.socketPort.readyRead.connect(self.readData)
+        self.messageEditWidget.setButtonEnabled(True)
+        self.statusBar().showMessage(f"Connected to {socket.peerAddress().toString()}:{socket.peerPort()}.")
+        self.portTabWidget.setTabEnabled(0, False)
+
+    def socketClose(self):
+        self.socketPort = None
+        self.statusBar().showMessage("Socket closed.")
+        self.messageEditWidget.setButtonEnabled(False)
+        self.portTabWidget.setTabEnabled(0, True)
+
     def portOpen(self, port):
         self.serialPort = port
         self.serialPort.readyRead.connect(self.readData)
         self.messageEditWidget.setButtonEnabled(True)
         self.statusBar().showMessage(f"Connected to {port.portName()} at {port.baudRate()} baud.")
+        self.portTabWidget.setTabEnabled(1, False)
 
     def portClose(self):
         self.serialPort = None
         self.statusBar().showMessage("Serial port closed.")
         self.messageEditWidget.setButtonEnabled(False)
+        self.portTabWidget.setTabEnabled(1, True)
 
     def readData(self):
+        data = self.serialPort.readAll() if self.serialPort and self.serialPort.isOpen() else self.socketPort.readAll()
         if self.messageEditWidget.isHexChecked():
-            data = self.serialPort.readAll()
             data = [x.hex() for x in data]
             self.messageDisplay.recv(" ".join(data) + "\n")  
         else:
             try:
-                data = self.serialPort.readAll()
                 data = str(data.data(), encoding='utf-8')
                 self.messageDisplay.recv( data)
             except:
                 self.messageDisplay.appendMessage("error\n")
 
     def sendData(self, data):
-        if data and self.serialPort.isOpen():
+        if data and (self.serialPort and self.serialPort.isOpen() or self.socketPort and self.socketPort.state() == QTcpSocket.SocketState.ConnectedState):
             if self.messageEditWidget.isHexChecked():
                 try:
                     byteArray = QByteArray(bytes.fromhex(data.replace(" ","")))
@@ -188,7 +207,10 @@ class MainWindow(QMainWindow):
                 if self.messageEditWidget.isLineFeedChecked():
                     byteArray.append(b'\n')
             
-            self.serialPort.write(byteArray)
+            if self.socketPort and self.socketPort.state() == QTcpSocket.SocketState.ConnectedState:
+                self.socketPort.write(byteArray)
+            else:
+                self.serialPort.write(byteArray)
             # Echo Sent Message
             self.messageDisplay.send(data + "\n")
     
