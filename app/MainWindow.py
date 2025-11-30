@@ -94,8 +94,8 @@ class MainWindow(QMainWindow):
         self.cyberGearWidget = CyberGearWidget(messenger=self.messageEditWidget)
         self.tabWidget.addTab(self.cyberGearWidget, "小米电机")
 
-        # self.canWidget = CANWidget()
-        # self.tabWidget.addTab(self.canWidget, "CAN")
+        self.canWidget = CANWidget()
+        self.tabWidget.addTab(self.canWidget, "CAN")
 
         self.graphicsWidget = GraphicsWidget()
         self.graphicsWidget.setMinimumWidth(800)
