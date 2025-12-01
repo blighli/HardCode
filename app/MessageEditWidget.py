@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QPushButton, QCheckBox
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 import can
 
 class MessageEditWidget(QWidget):
@@ -17,6 +17,7 @@ class MessageEditWidget(QWidget):
         self.messageEdit.setEditable(True)
         self.messageEdit.setFixedHeight(LINE_HEIGHT)
         self.messageEdit.setStyleSheet("font-family: Consolas;")
+        self.messageEdit.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
 
         self.messageSendButton = QPushButton("发送")
         self.messageSendButton.setFixedWidth(100)
