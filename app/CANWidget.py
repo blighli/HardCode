@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit
 from PyQt6.QtCore import Qt
 
 import can  # Assuming a CAN library is available
@@ -103,6 +103,13 @@ class CANWidget(QWidget):
         layout.addStretch()
         self.closedStatus()
 
+        QApplication.instance().aboutToQuit.connect(self.cleanUp)
+
+    def cleanUp(self):
+        if self.canBus is not None:
+            print("Shutdown canbus")
+            self.canBus.shutdown()
+            self.canBus = None
 
     def openedStatus(self):
         self.busTypeComboBox.setEnabled(False)
@@ -151,13 +158,13 @@ class CANWidget(QWidget):
         try:
             arbitration_id = int(self.arbitrationIdEdit.text(), 16)
         except:
-            QMessageBox.critical(self, "Error", f"Message arbitration_id({arbitration_id}) not in hex format")
+            QMessageBox.critical(self, "Error", f"Message arbitration_id({self.arbitrationIdEdit.text()}) not in hex format")
             return
         
         try:
             data = [int(item) for item in self.dataEdit.text().split(" ")]
         except:
-            QMessageBox.critical(self, "Error", f"Message data({data}) not in bytes format")
+            QMessageBox.critical(self, "Error", f"Message data({self.dataEdit.text()}) not in bytes format")
             return
 
         msg = can.Message(arbitration_id=arbitration_id,
