@@ -8,6 +8,8 @@ class SerialPortWidget(QWidget):
     port_open = pyqtSignal(QSerialPort)
     port_close = pyqtSignal()
 
+    port_select_changed = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(SerialPortWidget, self).__init__(parent)
 
@@ -21,7 +23,7 @@ class SerialPortWidget(QWidget):
         self.portComboBox = QComboBox()
         self.portComboBox.setMinimumWidth(200)
         self.portComboBox.setFixedHeight(LINE_HEIGHT)
-        self.refreshSerialPorts()
+        self.portComboBox.currentTextChanged.connect(self.portSelectChanged)
         # Baud Rate ComboBox
         self.baudRateComboBox = QComboBox()
         self.baudRateComboBox.setMinimumWidth(200)
@@ -44,6 +46,17 @@ class SerialPortWidget(QWidget):
 
         self.portConnectButton.clicked.connect(self.connectPort)
         self.portRefreshButton.clicked.connect(self.refreshSerialPorts)
+    
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.refreshSerialPorts()
+
+    def portSelectChanged(self):
+        port: QSerialPortInfo = self.portComboBox.currentData()
+        if port is not None:
+            self.port_select_changed.emit(port.portName())
+        else:
+            self.port_select_changed.emit("")
 
     def baudRate(self):
         return int(self.baudRateComboBox.currentText())

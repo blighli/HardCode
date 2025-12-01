@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         self.tabWidget.addTab(self.cyberGearWidget, "小米电机")
 
         self.canWidget = CANWidget()
+        self.serialPortWidget.port_select_changed.connect(self.canWidget.setChannel)
         self.tabWidget.addTab(self.canWidget, "CAN")
 
         self.graphicsWidget = GraphicsWidget()
