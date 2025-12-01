@@ -46,3 +46,16 @@ jog+：41 54 90 07 eb fc 08 05 70 00 00 07 01 95 54 0d 0a
 jog停止：41 54 90 07 eb fc 08 05 70 00 00 07 00 7f ff 0d 0a
 jog-：41 54 90 07 eb fc 08 05 70 00 00 07 01 6a aa 0d 0a
 ```
+
+
+##CANable 2.0
+
+https://github.com/normaldotcom/canable2-fw
+
+大小写敏感，命令结尾加<CR>，即'\r'
+
+O<CR> - Open channel
+
+C<CR> - Close channel
+
+V<CR> - Returns firmware version and remote path as a string
