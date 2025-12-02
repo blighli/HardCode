@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPu
 from PyQt6.QtCore import Qt
 import can  # Assuming a CAN library is available
 from .MessageTableWidget import MessageTableWidget
+from .utils import assets_path
 
 class CANWidget(QWidget):
     def __init__(self, parent=None):
@@ -88,6 +89,7 @@ class CANWidget(QWidget):
         self.closedStatus()
 
         QApplication.instance().aboutToQuit.connect(self.cleanUp)
+        self.canMsgTable.loadTableFromFile(assets_path.get('config//default//CAN_EXT_FRAME.json'))
 
     def cleanUp(self):
         if self.canBus is not None:
