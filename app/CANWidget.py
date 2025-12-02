@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit
 from PyQt6.QtCore import Qt
-
 import can  # Assuming a CAN library is available
+from .MessageTableWidget import MessageTableWidget
 
 class CANWidget(QWidget):
     def __init__(self, parent=None):
@@ -51,6 +51,9 @@ class CANWidget(QWidget):
         self.arbitrationIdEdit.setFixedHeight(LINE_HEIGHT)
         arbitationLayout.addWidget(self.arbitrationIdEdit,2)
 
+        self.canMsgTable = MessageTableWidget()
+        layout.addWidget(self.canMsgTable)
+
         arbitationLayout.addSpacing(100)
 
         self.extendedIdCheckBox = QCheckBox()
@@ -71,25 +74,6 @@ class CANWidget(QWidget):
         self.dataEdit.setFixedHeight(LINE_HEIGHT)
         dataLayout.addWidget(self.dataEdit)
         layout.addLayout(dataLayout)
-
-        # sendTable = QTableWidget()
-
-        # sendTable.setColumnCount(1)
-        # sendTable.setRowCount(9)
-        # item = QTableWidgetItem("Arbitration ID")
-        # item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        # sendTable.setVerticalHeaderItem(0,item)
-        # for i in range(8):
-        #     item = QTableWidgetItem(f"Data Byte {i+1}")
-        #     item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        #     sendTable.setVerticalHeaderItem(i + 1, item)
-        
-        # sendTable.verticalHeader().setFixedWidth(100)
-        # sendTable.setHorizontalHeaderItem(0, QTableWidgetItem("Value"))
-        # sendTable.horizontalHeader().setStretchLastSection(True)
-        
-
-        # layout.addWidget(sendTable)
 
         layout.addSpacing(20)
         self.sendButton = QPushButton("Send CAN Message")
