@@ -98,6 +98,7 @@ class MainWindow(QMainWindow):
 
         self.canWidget = CANWidget()
         self.serialPortWidget.port_select_changed.connect(self.canWidget.setChannel)
+        self.canWidget.message_received.connect(self.messageDisplay.recv)
         self.tabWidget.addTab(self.canWidget, "CAN")
 
         self.graphicsWidget = GraphicsWidget()

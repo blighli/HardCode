@@ -1,14 +1,21 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit, QGroupBox
-from PyQt6.QtCore import Qt
-import can  # Assuming a CAN library is available
+from PyQt6.QtCore import Qt, pyqtSignal
+import can
+from threading import Thread
 from .MessageTableWidget import MessageTableWidget
 from .utils import assets_path
 
 class CANWidget(QWidget):
+    
+    message_received = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(CANWidget, self).__init__(parent)
         self.channel: str = None
         self.canBus: can.BusABC = None
+        self.reader: can.BufferedReader = None
+        self.notifier: can.Notifier = None
+        self.thread: Thread = None
         self.initUI()
 
     def initUI(self):
@@ -116,8 +123,9 @@ class CANWidget(QWidget):
          
 
     def setChannel(self, channel: str):
-        self.channel = channel
-        self.channelLabel.setText(f"Channel: <b>{channel}</b>")
+        if self.busTypeComboBox.isEnabled():
+            self.channel = channel
+            self.channelLabel.setText(f"Channel: <b>{channel}</b>")
 
 
     def cleanUp(self):
@@ -160,12 +168,32 @@ class CANWidget(QWidget):
             QMessageBox.warning(self, "Warning", "CAN channel not set.")
             return
         try:
-            self.canBus = can.interface.Bus(bustype=interface, channel=self.channel, bitrate=bitrate)
-        except:
-            QMessageBox.critical(self, "Error", "CAN bus open error")
+            open_can_bus = Thread(target=self.open_can_bus, args=(interface, bitrate))
+            open_can_bus.start()
+            open_can_bus.join()
+
+            self.reader = can.BufferedReader()
+            self.notifier = can.Notifier(self.canBus, [self.reader])
+            self.thread = Thread(target=self.receive_messages, daemon=True)
+            self.thread.start()
+            self.message_received.connect(self.display_message)
+            
+        except can.CanError as e:
+            QMessageBox.critical(self, "Error", f"CAN bus open error: {e}")
             return
         self.openedStatus()
-
+    
+    def open_can_bus(self, interface: str, bitrate: int):
+        self.canBus = can.interface.Bus(bustype=interface, channel=self.channel, bitrate=bitrate)
+    
+    def receive_messages(self):
+        while self.canBus is not None:
+            msg = self.reader.get_message(timeout=1.0)
+            if msg is not None:
+                self.message_received.emit(str(msg) + "\n")
+    
+    def display_message(self, msg: str):
+        print(f"Received message: {msg}")
 
 
     def sendCANMessage(self):
@@ -174,12 +202,12 @@ class CANWidget(QWidget):
             return
         
         arbitration_id_hexStr: str = self.arbitationIdTable.encode().replace(" ", "")
-        print("arbitration_id:", arbitration_id_hexStr)
+        #print("arbitration_id:", arbitration_id_hexStr)
         arbitration_id = int(arbitration_id_hexStr, 16)
         self.arbitrationIdEdit.setText(hex(arbitration_id))
 
         message_data_hexStr: str = self.msgDataTable.encode().replace(" ", "")
-        print("message_data:", message_data_hexStr)
+        #print("message_data:", message_data_hexStr)
         try:
             data = bytes.fromhex(message_data_hexStr)
             self.dataEdit.setText(" ".join([str(b) for b in data]))
