@@ -24,7 +24,7 @@ import json
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.configFileName = "config/config.txt"
+        self.configFileName = assets_path.get("config/config.txt")
         self.api_server = FastAPIServer()
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
