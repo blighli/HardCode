@@ -27,7 +27,7 @@ class CANWidget(QWidget):
         self.busTypeComboBox = QComboBox()
         self.busTypeComboBox.setMinimumWidth(200)
         self.busTypeComboBox.setFixedHeight(LINE_HEIGHT)
-        self.busTypeComboBox.addItems(["slcan", "socketcan", "pcan"])
+        self.busTypeComboBox.addItems(["slcan", "socketcan", "pcan", "zlgcan"])
         self.busTypeComboBox.setCurrentIndex(0)  # Default to slcan
         configLayout.addWidget(self.busTypeComboBox, 3)
 
