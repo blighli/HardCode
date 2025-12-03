@@ -19,6 +19,9 @@ class CANWidget(QWidget):
         configLayout = QHBoxLayout()
         layout.addLayout(configLayout)
 
+        self.channelLabel = QLabel("CAN Channel: Not Set")
+        configLayout.addWidget(self.channelLabel)
+
         # Bus Type ComboBox
         configLayout.addWidget(QLabel("Bus Type:"), 1, Qt.AlignmentFlag.AlignRight)
         self.busTypeComboBox = QComboBox()
@@ -113,6 +116,7 @@ class CANWidget(QWidget):
 
     def setChannel(self, channel: str):
         self.channel = channel
+        self.channelLabel.setText(f"CAN Channel: {channel}")
 
 
     def cleanUp(self):
