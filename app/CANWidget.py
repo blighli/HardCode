@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,QComboBox, QTableWidget, QTableWidgetItem, QMessageBox, QLabel, QCheckBox, QLineEdit, QGroupBox
 from PyQt6.QtCore import Qt
 import can  # Assuming a CAN library is available
 from .MessageTableWidget import MessageTableWidget
@@ -16,7 +16,6 @@ class CANWidget(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        layout.addSpacing(20)
         configLayout = QHBoxLayout()
         layout.addLayout(configLayout)
 
@@ -44,17 +43,34 @@ class CANWidget(QWidget):
         self.openCanPushButton.clicked.connect(self.openCan)
         configLayout.addWidget(self.openCanPushButton)
 
-        layout.addSpacing(20)
+
+        # Edit arbitration ID table
+        arbitationIdLayout = QVBoxLayout()
+        arbitationIdLayout.addWidget(QLabel("Arbitration IDs:"))
+        self.arbitationIdTable = MessageTableWidget()
+        self.arbitationIdTable.setButtonVisible(False)
+        self.arbitationIdTable.setMinimumHeight(250)
+        arbitationIdLayout.addWidget(self.arbitationIdTable)
+        layout.addLayout(arbitationIdLayout)
+
+
+        # Edit message data table
+        dataLayout = QVBoxLayout()
+        dataLayout.addWidget(QLabel("Message Data:"))
+        self.msgDataTable = MessageTableWidget()
+        self.msgDataTable.setButtonVisible(False)
+        self.msgDataTable.setMinimumHeight(350)
+        dataLayout.addWidget(self.msgDataTable)
+        layout.addLayout(dataLayout)
+
+
+        layout.addSpacing(10)
         arbitationLayout = QHBoxLayout()
         arbitationLayout.addWidget(QLabel("Arbitration ID:"))
         self.arbitrationIdEdit = QLineEdit()
-        self.arbitrationIdEdit.setPlaceholderText("Enter Arbitration ID (e.g., '0x1AB')")
+        self.arbitrationIdEdit.setPlaceholderText("Enter Arbitration ID (e.g., '0xc0ffee')")
         self.arbitrationIdEdit.setFixedHeight(LINE_HEIGHT)
         arbitationLayout.addWidget(self.arbitrationIdEdit,2)
-
-        self.canMsgTable = MessageTableWidget()
-        layout.addWidget(self.canMsgTable)
-
         arbitationLayout.addSpacing(100)
 
         self.extendedIdCheckBox = QCheckBox()
@@ -67,9 +83,9 @@ class CANWidget(QWidget):
 
         layout.addLayout(arbitationLayout)
 
-        layout.addSpacing(20)
+        layout.addSpacing(10)
         dataLayout = QHBoxLayout()
-        dataLayout.addWidget(QLabel("Data:"))
+        dataLayout.addWidget(QLabel("Message Data:"))
         self.dataEdit = QLineEdit()
         self.dataEdit.setPlaceholderText("Enter data bytes separated by spaces (e.g., '0 25 0 1 3 1 4 1')")
         self.dataEdit.setFixedHeight(LINE_HEIGHT)
@@ -89,11 +105,11 @@ class CANWidget(QWidget):
         self.closedStatus()
 
         QApplication.instance().aboutToQuit.connect(self.cleanUp)
-        self.canMsgTable.loadTableFromFile(assets_path.get('config//default//CAN_EXT_FRAME.json'))
+        self.arbitationIdTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_ArbitationId.json'))
+        self.msgDataTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_MsgData.json'))
 
     def cleanUp(self):
         if self.canBus is not None:
-            print("Shutdown canbus")
             self.canBus.shutdown()
             self.canBus = None
 
@@ -106,6 +122,7 @@ class CANWidget(QWidget):
         self.canFDCheckBox.setEnabled(True)
         self.openCanPushButton.setText("关闭")
         self.sendButton.setEnabled(True)
+        self.msgDataTable.setButtonEnabled(True)
 
     def closedStatus(self):
         self.busTypeComboBox.setEnabled(True)
@@ -116,6 +133,7 @@ class CANWidget(QWidget):
         self.canFDCheckBox.setEnabled(False)
         self.openCanPushButton.setText("打开")
         self.sendButton.setEnabled(False)
+        self.msgDataTable.setButtonEnabled(False)
 
     def openCan(self):
         if self.canBus is not None:
@@ -136,11 +154,37 @@ class CANWidget(QWidget):
         self.openedStatus()
 
 
+
     def sendCANMessage(self):
         if self.canBus == None:
             QMessageBox.critical(self, "Error", "CAN bus not opened")
             return
         
+        arbitration_id_hexStr: str = self.arbitationIdTable.encode().replace(" ", "")
+        print("arbitration_id:", arbitration_id_hexStr)
+        arbitration_id = int(arbitration_id_hexStr, 16)
+        self.arbitrationIdEdit.setText(hex(arbitration_id))
+
+
+        message_data_hexStr: str = self.msgDataTable.encode().replace(" ", "")
+        print("message_data:", message_data_hexStr)
+        try:
+            data = bytes.fromhex(message_data_hexStr)
+            self.dataEdit.setText(" ".join([str(b) for b in data]))
+        except:
+            QMessageBox.critical(self, "Error", f"Message data({message_data_hexStr}) not in bytes format")
+            return
+        msg = can.Message(arbitration_id=arbitration_id,
+                        data=data,
+                        is_extended_id=self.extendedIdCheckBox.isChecked())
+        try:
+            self.canBus.send(msg)
+        except can.CanError:
+            QMessageBox.critical(self, "Error", "Message NOT sent")
+        
+        
+        return 
+
         try:
             arbitration_id = int(self.arbitrationIdEdit.text(), 16)
         except:
@@ -161,6 +205,9 @@ class CANWidget(QWidget):
             self.canBus.send(msg)
         except can.CanError:
             QMessageBox.critical(self, "Error", "Message NOT sent")
+
+
+
 
     def setChannel(self, channel: str):
         self.channel = channel

@@ -35,7 +35,7 @@ class MessageTableWidget(QWidget):
             layout.addWidget(self.statusLabel)
 
             self.encodeButton = QPushButton("encode")
-            self.encodeButton.setFixedWidth(100)
+            self.encodeButton.setMinimumWidth(100)
             self.encodeButton.setFixedHeight(LINE_HEIGHT)
             self.encodeButton.clicked.connect(self.encode)
 
@@ -126,6 +126,12 @@ class MessageTableWidget(QWidget):
 
     def setButtonText(self, buttonText):
         self.encodeButton.setText(buttonText)
+
+    def setButtonEnabled(self, enabled: bool):
+        self.encodeButton.setEnabled(enabled)
+
+    def setButtonVisible(self, visible: bool):
+        self.encodeButton.setVisible(visible)
         
 
     def encode(self):
