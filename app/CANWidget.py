@@ -108,10 +108,18 @@ class CANWidget(QWidget):
         self.arbitationIdTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_ArbitationId.json'))
         self.msgDataTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_MsgData.json'))
 
+
+         
+
+    def setChannel(self, channel: str):
+        self.channel = channel
+
+
     def cleanUp(self):
         if self.canBus is not None:
             self.canBus.shutdown()
             self.canBus = None
+
 
     def openedStatus(self):
         self.busTypeComboBox.setEnabled(False)
@@ -156,7 +164,7 @@ class CANWidget(QWidget):
 
 
     def sendCANMessage(self):
-        if self.canBus == None:
+        if self.canBus is None:
             QMessageBox.critical(self, "Error", "CAN bus not opened")
             return
         
@@ -164,7 +172,6 @@ class CANWidget(QWidget):
         print("arbitration_id:", arbitration_id_hexStr)
         arbitration_id = int(arbitration_id_hexStr, 16)
         self.arbitrationIdEdit.setText(hex(arbitration_id))
-
 
         message_data_hexStr: str = self.msgDataTable.encode().replace(" ", "")
         print("message_data:", message_data_hexStr)
@@ -181,33 +188,3 @@ class CANWidget(QWidget):
             self.canBus.send(msg)
         except can.CanError:
             QMessageBox.critical(self, "Error", "Message NOT sent")
-        
-        
-        return 
-
-        try:
-            arbitration_id = int(self.arbitrationIdEdit.text(), 16)
-        except:
-            QMessageBox.critical(self, "Error", f"Message arbitration_id({self.arbitrationIdEdit.text()}) not in hex format")
-            return
-        
-        try:
-            data = [int(item) for item in self.dataEdit.text().split(" ")]
-        except:
-            QMessageBox.critical(self, "Error", f"Message data({self.dataEdit.text()}) not in bytes format")
-            return
-
-        msg = can.Message(arbitration_id=arbitration_id,
-                        data=data,
-                        is_extended_id=self.extendedIdCheckBox.isChecked())
-        print("Message: {}".format(msg))
-        try:
-            self.canBus.send(msg)
-        except can.CanError:
-            QMessageBox.critical(self, "Error", "Message NOT sent")
-
-
-
-
-    def setChannel(self, channel: str):
-        self.channel = channel
