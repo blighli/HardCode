@@ -89,10 +89,11 @@ class MainWindow(QMainWindow):
         rightBox.addWidget(self.tabWidget)
         
         self.commonWidget = CommonWidget()
-        self.commonWidget.send_message.connect(self.sendData)
+        self.commonWidget.send_message.connect(self.messageEditWidget.sendMessage)
         self.tabWidget.addTab(self.commonWidget, "通用")
 
-        self.cyberGearWidget = CyberGearWidget(messenger=self.messageEditWidget)
+        self.cyberGearWidget = CyberGearWidget()
+        self.cyberGearWidget.send_message.connect(self.messageEditWidget.sendMessage)
         self.tabWidget.addTab(self.cyberGearWidget, "小米电机")
 
         self.canWidget = CANWidget()
