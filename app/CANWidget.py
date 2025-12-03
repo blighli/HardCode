@@ -19,7 +19,7 @@ class CANWidget(QWidget):
         configLayout = QHBoxLayout()
         layout.addLayout(configLayout)
 
-        self.channelLabel = QLabel("CAN Channel: Not Set")
+        self.channelLabel = QLabel("Channel: Not Set")
         configLayout.addWidget(self.channelLabel)
 
         # Bus Type ComboBox
@@ -77,6 +77,7 @@ class CANWidget(QWidget):
         arbitationLayout.addSpacing(100)
 
         self.extendedIdCheckBox = QCheckBox()
+        self.extendedIdCheckBox.setChecked(True)
         self.extendedIdCheckBox.setText("Extended ID")
         arbitationLayout.addWidget(self.extendedIdCheckBox, 1)
 
@@ -116,7 +117,7 @@ class CANWidget(QWidget):
 
     def setChannel(self, channel: str):
         self.channel = channel
-        self.channelLabel.setText(f"CAN Channel: {channel}")
+        self.channelLabel.setText(f"Channel: <b>{channel}</b>")
 
 
     def cleanUp(self):
