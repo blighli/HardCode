@@ -71,26 +71,30 @@ class MessageTableWidget(QWidget):
             selectedRows.add(item.row())
         for row in sorted(selectedRows, reverse=True):
             self.table.removeRow(row)
+
+    def loadTableFromJson(self, data):
+        self.table.setRowCount(0)
+        for row in data:
+            self.addRow()
+            for col, value in enumerate(row):
+                if self.table.horizontalHeaderItem(col).text() == "Type":
+                    comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
+                    index = comboBox.findText(value)
+                    if index >= 0:
+                        comboBox.setCurrentIndex(index)
+                elif self.table.horizontalHeaderItem(col).text() == "Format":
+                    comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
+                    index = comboBox.findText(value)
+                    if index >= 0:
+                        comboBox.setCurrentIndex(index)
+                else:
+                    self.table.setItem(self.table.rowCount()-1, col, QTableWidgetItem(str(value)))
+
     
     def loadTableFromFile(self, filename):
         with open(filename, 'r') as f:
             data = json.load(f)
-            self.table.setRowCount(0)
-            for row in data:
-                self.addRow()
-                for col, value in enumerate(row):
-                    if self.table.horizontalHeaderItem(col).text() == "Type":
-                        comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
-                        index = comboBox.findText(value)
-                        if index >= 0:
-                            comboBox.setCurrentIndex(index)
-                    elif self.table.horizontalHeaderItem(col).text() == "Format":
-                        comboBox: QComboBox = self.table.cellWidget(self.table.rowCount()-1, col)
-                        index = comboBox.findText(value)
-                        if index >= 0:
-                            comboBox.setCurrentIndex(index)
-                    else:
-                        self.table.setItem(self.table.rowCount()-1, col, QTableWidgetItem(str(value)))
+            self.loadTableFromJson(data)
 
     def loadTable(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "JSON Files (*.json);;All Files (*)")
@@ -98,8 +102,7 @@ class MessageTableWidget(QWidget):
             return
         self.loadTableFromFile(filename)
         
-        
-    def saveTableToFile(self, filename):
+    def saveTableToJson(self):
         data = []
         for row in range(self.table.rowCount()):
             rowData = []
@@ -114,6 +117,10 @@ class MessageTableWidget(QWidget):
                     itemText = self.table.item(row, col).text()
                 rowData.append(itemText if itemText else "")
             data.append(rowData)
+        return data
+
+    def saveTableToFile(self, filename):
+        data = self.saveTableToJson()
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
 
