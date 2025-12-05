@@ -51,13 +51,18 @@ class CyberGearWidget(QWidget):
         layout.addWidget(self.tableWidget)
         self.tableWidget.addAction("Add Message", self.addMessage)
         self.tableWidget.addAction("Edit Message", self.editMessage)
-        self.tableWidget.addAction("Delete Message", self.deleteMessage)
         self.tableWidget.addAction("Send Message", self.sendMessage)
+        
         seperator = QAction(self)
         seperator.setSeparator(True)
         self.tableWidget.addAction(seperator)
         self.tableWidget.addAction("Load", self.loadMessages)
         self.tableWidget.addAction("Save", self.saveMessages)
+        
+        seperator = QAction(self)
+        seperator.setSeparator(True)
+        self.tableWidget.addAction(seperator)
+        self.tableWidget.addAction("Delete Message", self.deleteMessage)
         self.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.ActionsContextMenu)
         
         self.setLayout(layout)
