@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout, QTableWidget, QTableWidgetItem
 from PyQt6.QtCore import pyqtSignal
 
 class CyberGearWidget(QWidget):
@@ -10,24 +10,30 @@ class CyberGearWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QGridLayout()
+        layout = QVBoxLayout()
 
+        controlLayout = QHBoxLayout()
         startButton = QPushButton("开始控制")   
         startButton.setFixedWidth(100)
         startButton.clicked.connect(self.startControl)
-        layout.addWidget(startButton, 1, 1)
+        controlLayout.addWidget(startButton)
 
         cwButton = QPushButton("正向运行")
         cwButton.setFixedWidth(100)
-        layout.addWidget(cwButton, 1, 3)
+        controlLayout.addWidget(cwButton)
         cwButton.pressed.connect(self.runForward)
         cwButton.released.connect(self.stopRun)
 
         ccwButton = QPushButton("反向运行")
         ccwButton.setFixedWidth(100)
-        layout.addWidget(ccwButton,1,5)
+        controlLayout.addWidget(ccwButton)
         ccwButton.pressed.connect(self.runBackward)
         ccwButton.released.connect(self.stopRun)
+        
+        layout.addLayout(controlLayout)
+
+        self.tableWidget = QTableWidget()
+        layout.addWidget(self.tableWidget)
         
         self.setLayout(layout)
 
