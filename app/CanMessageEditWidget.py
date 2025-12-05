@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton, QLineEdit
 from .MessageTableWidget import MessageTableWidget
 
 HEADERS = ["data", "json"]
@@ -13,6 +13,10 @@ class CanMessageEditWidget(QDialog):
         self.resize(600, 400)
 
         layout = QVBoxLayout()
+
+        self.nameEdit = QLineEdit("")
+        self.nameEdit.setPlaceholderText("Message Name")
+        layout.addWidget(self.nameEdit)
 
         self.tableWidget: MessageTableWidget = MessageTableWidget()
         self.tableWidget.setButtonVisible(False)
@@ -31,10 +35,14 @@ class CanMessageEditWidget(QDialog):
         self.setLayout(layout)
 
     def getMessageData(self):
+        name = self.nameEdit.text().strip()
+        if not name:
+            name = "CAN_Message"
         encodedData = self.tableWidget.encode()
         jsonData = self.tableWidget.saveTableToJson()
-        return (encodedData, jsonData)
+        return (encodedData, jsonData, name)
 
-    def setMessageData(self, messageData):
+    def setMessageData(self, messageData, name):
+        self.nameEdit.setText(name)
         if messageData:
             self.tableWidget.loadTableFromJson(messageData)
