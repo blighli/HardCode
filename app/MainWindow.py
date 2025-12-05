@@ -186,7 +186,7 @@ class MainWindow(QMainWindow):
 
     def readData(self):
         data = self.serialPort.readAll() if self.serialPort and self.serialPort.isOpen() else self.socketPort.readAll()
-        if self.messageEditWidget.isHexChecked():
+        if self.messageDisplay.isHexMode():
             data = [x.hex() for x in data]
             self.messageDisplay.recv(" ".join(data) + "\n")  
         else:
