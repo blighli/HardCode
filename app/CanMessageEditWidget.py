@@ -10,7 +10,7 @@ class CanMessageEditWidget(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Edit CAN Message")
-        self.resize(600, 400)
+        self.resize(800, 600)
 
         layout = QVBoxLayout()
 
