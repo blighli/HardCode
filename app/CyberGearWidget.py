@@ -54,7 +54,7 @@ class CyberGearWidget(QWidget):
 
 
     def cleanUp(self):
-        self.messageListWidget.saveMessagesToFile(assets_path.get(self.DEFAULT_FILE_PATH))
+        self.messageListWidget.saveMessagesToFile(assets_path.get(self.DEFAULT_MESSAGE_LIST_FILE_PATH))
 
 
     
