@@ -2,12 +2,12 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QPushButton, QCheck
 from PyQt6.QtCore import pyqtSignal, Qt
 import can
 
-class MessageEditWidget(QWidget):
+class MessageLineEditWidget(QWidget):
 
     message_send = pyqtSignal(str)
 
     def __init__(self, parent=None):
-        super(MessageEditWidget, self).__init__(parent)
+        super(MessageLineEditWidget, self).__init__(parent)
 
         LINE_HEIGHT = 30
         layout = QHBoxLayout()

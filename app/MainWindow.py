@@ -14,7 +14,7 @@ from .WebService import FastAPIServer
 from .SerialPortWidget import SerialPortWidget
 from .SocketPortWidget import SocketPortWidget
 from .MessageDisplayWidget import MessageDisplayWidget
-from .MessageEditWidget import MessageEditWidget
+from .MessageLineEditWidget import MessageLineEditWidget
 from .CommonWidget import CommonWidget
 from .CANWidget import CANWidget
 from .CyberGearWidget import CyberGearWidget
@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         leftBox.addWidget(self.messageDisplay,stretch=1)
 
         # Message Edit Widget
-        self.messageEditWidget = MessageEditWidget()
+        self.messageEditWidget = MessageLineEditWidget()
         self.messageEditWidget.message_send.connect(self.sendData)
         leftBox.addWidget(self.messageEditWidget)
 
