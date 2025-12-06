@@ -90,7 +90,7 @@ class MessageListTableWidget(QWidget):
 
 
     def loadMessages(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "JSON Files (*.json);;All Files (*)")
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "Message List Files (*.list);;All Files (*)")
         if not filename:
             return
         self.loadMessagesFromFile(filename)
@@ -113,7 +113,7 @@ class MessageListTableWidget(QWidget):
 
 
     def saveMessages(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "JSON Files (*.json);;All Files (*)")
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "Message List Files (*.list);;All Files (*)")
         if not filename:
             return
         self.saveMessagesToFile(filename)

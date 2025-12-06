@@ -97,7 +97,7 @@ class MessageTemplateTableWidget(QWidget):
             self.loadTableFromJson(data)
 
     def loadTable(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "JSON Files (*.json);;All Files (*)")
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Table File", "", "Message Template Files (*.template);;All Files (*)")
         if not filename:
             return
         self.loadTableFromFile(filename)
@@ -125,7 +125,7 @@ class MessageTemplateTableWidget(QWidget):
             json.dump(data, f, indent=4)
 
     def saveTable(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "JSON Files (*.json);;All Files (*)")
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Table File", "", "Message Template Files (*.template);;All Files (*)")
         if not filename:
             return
         self.saveTableToFile(filename)

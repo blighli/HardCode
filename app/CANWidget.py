@@ -116,8 +116,8 @@ class CANWidget(QWidget):
         self.closedStatus()
 
         QApplication.instance().aboutToQuit.connect(self.cleanUp)
-        self.arbitationIdTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_ArbitationId.json'))
-        self.msgDataTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_MsgData.json'))
+        self.arbitationIdTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_ArbitationId.template'))
+        self.msgDataTable.loadTableFromFile(assets_path.get('config//default//CAN_Ext_MsgData.template'))
 
 
          

@@ -9,8 +9,8 @@ class CyberGearWidget(QWidget):
     
     send_message = pyqtSignal(str)
     
-    DEFAULT_MESSAGE_LIST_FILE_PATH = 'config//default//CyberGearMessages.json'
-    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//USBCAN_AT.json'
+    DEFAULT_MESSAGE_LIST_FILE_PATH = 'config//default//CyberGear_Messages.list'
+    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//USBCAN_AT.template'
 
     def __init__(self, parent=None):
         super(CyberGearWidget, self).__init__(parent)
