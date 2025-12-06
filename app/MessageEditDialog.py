@@ -11,7 +11,7 @@ class MessageEditDialog(QDialog):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Edit CAN Message")
+        self.setWindowTitle("Edit Message")
         self.resize(800, 600)
 
         layout = QVBoxLayout()

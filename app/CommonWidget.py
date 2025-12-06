@@ -7,7 +7,7 @@ from .utils import assets_path
 class CommonWidget(QWidget):
 
     send_message = pyqtSignal(str)
-    DEFAULT_FILE_PATH = 'config//default//USBCAN_AT.json'
+    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//USBCAN_AT.json'
 
     def __init__(self, parent=None):
         super(CommonWidget, self).__init__(parent)
@@ -19,9 +19,9 @@ class CommonWidget(QWidget):
         layout.addWidget(self.msgTable)
         
         self.msgTable.send_message.connect(self.send_message)
-        self.msgTable.loadTableFromFile(assets_path.get(self.DEFAULT_FILE_PATH))
+        self.msgTable.loadTableFromFile(assets_path.get(self.DEFAULT_MESSAGE_TEMPLATE_FILE_PATH))
         self.msgTable.setButtonText("发送")
 
-        self.msgListTable = MessageListTableWidget(messageTemplateFilePath=assets_path.get(self.DEFAULT_FILE_PATH))
+        self.msgListTable = MessageListTableWidget(messageTemplateFilePath=assets_path.get(self.DEFAULT_MESSAGE_TEMPLATE_FILE_PATH))
         self.msgListTable.send_message.connect(self.send_message)
         layout.addWidget(self.msgListTable)

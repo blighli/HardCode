@@ -5,11 +5,11 @@ from PyQt6.QtCore import Qt, pyqtSignal
 import json
 from .MessageEditDialog import MessageEditDialog
 
-HEADERS = ["data", "name"]
 
 class MessageListTableWidget(QWidget):
 
     send_message = pyqtSignal(str)
+    HEADERS = ["Message", "Name"]
 
     def __init__(self, parent=None, messageTemplateFilePath=""):
         super(MessageListTableWidget, self).__init__(parent)
@@ -19,10 +19,10 @@ class MessageListTableWidget(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.tableWidget = QTableWidget()
-        self.tableWidget.setColumnCount(len(HEADERS))
-        self.tableWidget.setHorizontalHeaderLabels(HEADERS)
-        self.tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        self.tableWidget.setColumnCount(len(self.HEADERS))
+        self.tableWidget.setHorizontalHeaderLabels(self.HEADERS)
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(200)
         self.tableWidget.setRowCount(0)
         
         layout.addWidget(self.tableWidget)
