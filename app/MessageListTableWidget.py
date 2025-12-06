@@ -13,6 +13,7 @@ class MessageListTableWidget(QWidget):
 
     def __init__(self, parent=None, messageTemplateFilePath=""):
         super(MessageListTableWidget, self).__init__(parent)
+        self.messageEditDialog = None
         self.messageTemplateFilePath = messageTemplateFilePath
         self.initUI()
 
@@ -56,11 +57,12 @@ class MessageListTableWidget(QWidget):
 
 
     def showMessageDialog(self, row=-1, messageData=None, name=""):
-        messageEditDialog = MessageEditDialog(messageTemplateFilePath=self.messageTemplateFilePath)
+        if not self.messageEditDialog:
+            self.messageEditDialog = MessageEditDialog(messageTemplateFilePath=self.messageTemplateFilePath)
         if messageData:
-            messageEditDialog.setMessageData(messageData, name)
-        if messageEditDialog.exec() == QDialog.DialogCode.Accepted:
-            messageData = messageEditDialog.getMessageData()
+            self.messageEditDialog.setMessageData(messageData, name)
+        if self.messageEditDialog.exec() == QDialog.DialogCode.Accepted:
+            messageData = self.messageEditDialog.getMessageData()
             item = QTableWidgetItem(messageData[0])
             item.setData(Qt.ItemDataRole.UserRole, messageData[1])
             if row == -1:
