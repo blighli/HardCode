@@ -15,12 +15,12 @@ def createComboBox(items, currentText=""):
         comboBox.setCurrentIndex(index)
     return comboBox
 
-class MessageTableWidget(QWidget):
+class MessageTemplateTableWidget(QWidget):
 
     send_message = pyqtSignal(str)
 
     def __init__(self, parent=None):
-            super(MessageTableWidget, self).__init__(parent)
+            super(MessageTemplateTableWidget, self).__init__(parent)
 
             layout = QVBoxLayout(self)
             self.table = QTableWidget()

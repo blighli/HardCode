@@ -1,11 +1,11 @@
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton, QLineEdit
-from .MessageTableWidget import MessageTableWidget
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit
+from .MessageTemplateTableWidget import MessageTemplateTableWidget
 
 HEADERS = ["data", "json"]
 
-class CanMessageEditWidget(QDialog):
+class MessageEditDialog(QDialog):
     def __init__(self, parent=None):
-        super(CanMessageEditWidget, self).__init__(parent)
+        super(MessageEditDialog, self).__init__(parent)
         self.initUI()
 
     def initUI(self):
@@ -18,7 +18,7 @@ class CanMessageEditWidget(QDialog):
         self.nameEdit.setPlaceholderText("Message Name")
         layout.addWidget(self.nameEdit)
 
-        self.tableWidget: MessageTableWidget = MessageTableWidget()
+        self.tableWidget: MessageTemplateTableWidget = MessageTemplateTableWidget()
         self.tableWidget.setButtonVisible(False)
         layout.addWidget(self.tableWidget)
 

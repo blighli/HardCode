@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPu
 from PyQt6.QtCore import Qt, pyqtSignal
 import can
 from threading import Thread
-from .MessageTableWidget import MessageTableWidget
+from .MessageTemplateTableWidget import MessageTemplateTableWidget
 from .utils import assets_path
 
 class CANWidget(QWidget):
@@ -57,7 +57,7 @@ class CANWidget(QWidget):
         # Edit arbitration ID table
         arbitationIdLayout = QVBoxLayout()
         arbitationIdLayout.addWidget(QLabel("Arbitration IDs:"))
-        self.arbitationIdTable = MessageTableWidget()
+        self.arbitationIdTable = MessageTemplateTableWidget()
         self.arbitationIdTable.setButtonVisible(False)
         self.arbitationIdTable.setMinimumHeight(250)
         arbitationIdLayout.addWidget(self.arbitationIdTable)
@@ -67,7 +67,7 @@ class CANWidget(QWidget):
         # Edit message data table
         dataLayout = QVBoxLayout()
         dataLayout.addWidget(QLabel("Message Data:"))
-        self.msgDataTable = MessageTableWidget()
+        self.msgDataTable = MessageTemplateTableWidget()
         self.msgDataTable.setButtonVisible(False)
         self.msgDataTable.setMinimumHeight(350)
         dataLayout.addWidget(self.msgDataTable)

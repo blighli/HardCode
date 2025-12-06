@@ -1,9 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout, QTableWidget,QHeaderView, QTableWidgetItem, QFileDialog, QMessageBox
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QDialog
 from PyQt6.QtCore import Qt, pyqtSignal
-from .MessageListWidget import MessageListWidget
-import json
+from .MessageListTableWidget import MessageListTableWidget
 import os
 from .utils import assets_path
 
@@ -41,7 +38,7 @@ class CyberGearWidget(QWidget):
         
         layout.addLayout(controlLayout)
 
-        self.messageListWidget = MessageListWidget()
+        self.messageListWidget = MessageListTableWidget()
         self.messageListWidget.send_message.connect(self.sendMessage)
         layout.addWidget(self.messageListWidget)
 

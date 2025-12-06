@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QFileDialog, QComboBox, QHeaderView, QLabel
 from PyQt6.QtCore import Qt, pyqtSignal
 import json
-from .MessageTableWidget import MessageTableWidget
+from .MessageTemplateTableWidget import MessageTemplateTableWidget
 from .utils import assets_path
 
 class CommonWidget(QWidget):
@@ -15,7 +15,7 @@ class CommonWidget(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        self.msgTable = MessageTableWidget()
+        self.msgTable = MessageTemplateTableWidget()
         layout.addWidget(self.msgTable)
         
         self.msgTable.send_message.connect(self.send_message)

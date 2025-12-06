@@ -1,20 +1,18 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout, QTableWidget,QHeaderView, QTableWidgetItem, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget,QHeaderView, QTableWidgetItem, QFileDialog, QMessageBox
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QDialog
 from PyQt6.QtCore import Qt, pyqtSignal
 import json
-import os
-from .utils import assets_path
-from .CanMessageEditWidget import CanMessageEditWidget
+from .MessageEditDialog import MessageEditDialog
 
 HEADERS = ["data", "name"]
 
-class MessageListWidget(QWidget):
+class MessageListTableWidget(QWidget):
 
     send_message = pyqtSignal(str)
 
     def __init__(self, parent=None):
-        super(MessageListWidget, self).__init__(parent)
+        super(MessageListTableWidget, self).__init__(parent)
         self.initUI()
 
     def initUI(self):
@@ -58,11 +56,11 @@ class MessageListWidget(QWidget):
 
 
     def showMessageDialog(self, row=-1, messageData=None, name=""):
-        canMessageEditWidget = CanMessageEditWidget()
+        messageEditDialog = MessageEditDialog()
         if messageData:
-            canMessageEditWidget.setMessageData(messageData, name)
-        if canMessageEditWidget.exec() == QDialog.DialogCode.Accepted:
-            messageData = canMessageEditWidget.getMessageData()
+            messageEditDialog.setMessageData(messageData, name)
+        if messageEditDialog.exec() == QDialog.DialogCode.Accepted:
+            messageData = messageEditDialog.getMessageData()
             item = QTableWidgetItem(messageData[0])
             item.setData(Qt.ItemDataRole.UserRole, messageData[1])
             if row == -1:
