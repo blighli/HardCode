@@ -7,7 +7,7 @@ from .utils import assets_path
 class CommonWidget(QWidget):
 
     send_message = pyqtSignal(str)
-    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//USBCAN_AT.template'
+    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//Common_Serial_Message.template'
 
     def __init__(self, parent=None):
         super(CommonWidget, self).__init__(parent)
