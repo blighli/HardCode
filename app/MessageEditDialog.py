@@ -1,11 +1,13 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit
 from .MessageTemplateTableWidget import MessageTemplateTableWidget
+import os
 
 HEADERS = ["data", "json"]
 
 class MessageEditDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, messageTemplateFilePath=""):
         super(MessageEditDialog, self).__init__(parent)
+        self.messageTemplateFilePath = messageTemplateFilePath
         self.initUI()
 
     def initUI(self):
@@ -19,7 +21,10 @@ class MessageEditDialog(QDialog):
         layout.addWidget(self.nameEdit)
 
         self.tableWidget: MessageTemplateTableWidget = MessageTemplateTableWidget()
+        if os.path.exists(self.messageTemplateFilePath):
+            self.tableWidget.loadTableFromFile(self.messageTemplateFilePath)
         self.tableWidget.setButtonVisible(False)
+
         layout.addWidget(self.tableWidget)
 
         buttonLayout = QHBoxLayout()
@@ -33,6 +38,7 @@ class MessageEditDialog(QDialog):
         
         layout.addLayout(buttonLayout)
         self.setLayout(layout)
+
 
     def getMessageData(self):
         name = self.nameEdit.text().strip()

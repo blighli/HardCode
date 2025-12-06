@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QPushButton, QCheckBox
 from PyQt6.QtCore import pyqtSignal, Qt
-import can
 
 class MessageLineEditWidget(QWidget):
 

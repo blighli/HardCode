@@ -4,12 +4,13 @@ from .MessageListTableWidget import MessageListTableWidget
 import os
 from .utils import assets_path
 
-HEADERS = ["data", "name"]
 
 class CyberGearWidget(QWidget):
     
     send_message = pyqtSignal(str)
-    DEFAULT_FILE_PATH = 'config//default//CyberGearMessages.json'
+    
+    DEFAULT_MESSAGE_LIST_FILE_PATH = 'config//default//CyberGearMessages.json'
+    DEFAULT_MESSAGE_TEMPLATE_FILE_PATH = 'config//default//USBCAN_AT.json'
 
     def __init__(self, parent=None):
         super(CyberGearWidget, self).__init__(parent)
@@ -38,13 +39,13 @@ class CyberGearWidget(QWidget):
         
         layout.addLayout(controlLayout)
 
-        self.messageListWidget = MessageListTableWidget()
+        self.messageListWidget = MessageListTableWidget(messageTemplateFilePath=assets_path.get(self.DEFAULT_MESSAGE_TEMPLATE_FILE_PATH))
         self.messageListWidget.send_message.connect(self.sendMessage)
         layout.addWidget(self.messageListWidget)
 
         self.setLayout(layout)
 
-        filename = assets_path.get(self.DEFAULT_FILE_PATH)
+        filename = assets_path.get(self.DEFAULT_MESSAGE_LIST_FILE_PATH)
         if os.path.exists(filename):
             self.messageListWidget.loadMessagesFromFile(filename)
 

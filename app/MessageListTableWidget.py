@@ -11,8 +11,9 @@ class MessageListTableWidget(QWidget):
 
     send_message = pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, messageTemplateFilePath=""):
         super(MessageListTableWidget, self).__init__(parent)
+        self.messageTemplateFilePath = messageTemplateFilePath
         self.initUI()
 
     def initUI(self):
@@ -43,7 +44,6 @@ class MessageListTableWidget(QWidget):
         
         self.setLayout(layout)
 
-
     
     def deleteMessage(self):
         selectedItems = self.tableWidget.selectedItems()
@@ -56,7 +56,7 @@ class MessageListTableWidget(QWidget):
 
 
     def showMessageDialog(self, row=-1, messageData=None, name=""):
-        messageEditDialog = MessageEditDialog()
+        messageEditDialog = MessageEditDialog(messageTemplateFilePath=self.messageTemplateFilePath)
         if messageData:
             messageEditDialog.setMessageData(messageData, name)
         if messageEditDialog.exec() == QDialog.DialogCode.Accepted:
