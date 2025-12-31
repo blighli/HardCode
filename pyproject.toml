@@ -53,7 +53,8 @@ torchvision = [
 ]
 
 [[tool.uv.index]]
-url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+# url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+url = "https://mirrors.aliyun.com/pypi/simple"
 default = true
 
 [[tool.uv.index]]
