@@ -1,6 +1,9 @@
 :设置exe文件名称
 set name=HardCode
 
+:获取git版本号
+python get_version.py
+
 :执行打包命令生成exe文件
 uv run pyinstaller --add-binary "assets;assets" --add-binary "config;config" -i "assets\app.ico" -wF main.py -n %name% --clean
 

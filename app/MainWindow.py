@@ -29,8 +29,17 @@ class MainWindow(QMainWindow):
         self.api_server.start()
         self.serialPort: QSerialPort | None = None
         self.socketPort: QTcpSocket | None = None
+        self.version = self._read_version()
         self.initUI()
         self.loadAppConfig()
+
+    def _read_version(self):
+        try:
+            version_file = assets_path.get("assets//version")
+            with open(version_file, "r") as f:
+                return f.read().strip()
+        except Exception:
+            return ""
     
     def closeEvent(self, event):
         self.saveAppConfig()
@@ -44,7 +53,7 @@ class MainWindow(QMainWindow):
         LINE_HEIGHT = 30
         # Main Window Settings
         self.setWindowIcon(QIcon(assets_path.get('assets//app.ico')))
-        self.setWindowTitle("Hello from HardCode!")
+        self.setWindowTitle("HardCode")
         self.resize(1200, 800)
 
         # Central Widget and Layouts
@@ -133,6 +142,7 @@ class MainWindow(QMainWindow):
 
         helpMenu = menuBar.addMenu("Help")
         aboutAction = helpMenu.addAction("About")
+        aboutAction.triggered.connect(self.showAboutDialog)
 
 
     def openSerialPortDialog(self):
@@ -154,6 +164,11 @@ class MainWindow(QMainWindow):
         self.visionWidget2.setWindowTitle("Vision Window")
         self.visionWidget2.setGeometry(200, 200, 800, 600)
         self.visionWidget2.show()
+
+    def showAboutDialog(self):
+        from .AboutDialog import AboutDialog
+        dialog = AboutDialog(self.version, assets_path.get("assets//app.ico"), self)
+        dialog.exec()
 
     def rangeValueChanged(self, name, value):
         self.statusBar().showMessage(f"{name}={value}")

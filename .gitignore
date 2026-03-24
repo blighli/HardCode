@@ -265,3 +265,4 @@ cython_debug/
 *.app
 
 config/config.txt
+.claude/
